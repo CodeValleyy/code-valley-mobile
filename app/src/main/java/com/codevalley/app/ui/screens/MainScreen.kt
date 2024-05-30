@@ -56,8 +56,6 @@ fun MainScreen(navController: NavHostController? = null) {
             )
             Spacer(modifier = Modifier.height(32.dp))
             Button(onClick = {
-                val userId = 1
-                val token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJyaWNhcmRvLmp1ZXpAZ21haWwuY29tIiwidXNlcm5hbWUiOiJjYXJsaXRvMDYwNSIsImxhc3RMb2dpbkF0IjoiMjAyNC0wNS0yOVQxODo0NDozOC45ODRaIiwiaXNUd29GYWN0b3JBdXRoZW50aWNhdGVkIjpmYWxzZSwiaWF0IjoxNzE3MDA4Mjg4LCJleHAiOjE3MTcwOTQ2ODh9.6Xwkbe4a1QK6YsvVZES3-CIy0grpmxQL625fBVswqfU"
                 navController!!.navigate("profile")
             }) {
                 Text(text = "Get started")

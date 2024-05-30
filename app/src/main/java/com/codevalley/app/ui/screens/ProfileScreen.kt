@@ -1,10 +1,13 @@
 package com.codevalley.app.ui.screens
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
@@ -20,7 +23,10 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import coil.compose.rememberAsyncImagePainter
+import coil.compose.rememberImagePainter
 import com.codevalley.app.R
+import com.codevalley.app.utils.Constants
 
 @Composable
 fun ProfileScreen(userId: Int, token: String, navController: NavController, profileViewModel: ProfileViewModel = hiltViewModel()) {
@@ -30,6 +36,19 @@ fun ProfileScreen(userId: Int, token: String, navController: NavController, prof
     LaunchedEffect(Unit) {
         profileViewModel.loadProfile(userId, token)
     }
+
+    BackHandler {
+        navController.popBackStack()
+    }
+
+    if(profileState == null && errorMessage == null) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator()
+        }
+    } else
 
     if(errorMessage != null) {
         AlertDialog(
@@ -56,12 +75,30 @@ fun ProfileScreen(userId: Int, token: String, navController: NavController, prof
                 color = MaterialTheme.colors.background
             ) {
                 Column(
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    Button(
+                        onClick = {
+                            navController.popBackStack()
+                        },
+                        modifier = Modifier.padding(16.dp)
+                    ) {
+                        Text("Retour")
+                    }
+                }
+                Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center,
                     modifier = Modifier.padding(16.dp)
                 ) {
+                    val painter = if (!profile.avatar.isNullOrEmpty()) {
+                        rememberAsyncImagePainter(profile.avatar)
+                    } else {
+                        painterResource(id = R.drawable.image)
+                    }
+
                     Image(
-                        painter = painterResource(id = R.drawable.image),
+                        painter = painter,
                         contentDescription = null,
                         modifier = Modifier
                             .size(100.dp)
@@ -69,6 +106,7 @@ fun ProfileScreen(userId: Int, token: String, navController: NavController, prof
                             .background(MaterialTheme.colors.surface),
                         contentScale = ContentScale.Crop
                     )
+
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
                         text = profile.username,
@@ -100,9 +138,9 @@ fun ProfileScreen(userId: Int, token: String, navController: NavController, prof
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceEvenly
                     ) {
-                        ProfileStat("Followers", "6.3k")
-                        ProfileStat("Posts", "572")
-                        ProfileStat("Following", "2.5k")
+                        ProfileStat(label = "Followers", value = "6.3k")
+                        ProfileStat(label = "Posts", value = "572")
+                        ProfileStat(label = "Following", value = "2.5k")
                     }
                     Spacer(modifier = Modifier.height(16.dp))
                     // Display user posts
@@ -138,7 +176,16 @@ fun ProfileScreenPreview() {
     val navController = rememberNavController()
     ProfileScreen(
         userId = 1,
-        token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJyaWNhcmRvLmp1ZXpAZ21haWwuY29tIiwidXNlcm5hbWUiOiJjYXJsaXRvMDYwNSIsImxhc3RMb2dpbkF0IjoiMjAyNC0wNS0yOVQxODo0NDozOC45ODRaIiwiY3JlYXRlZEF0IjoiMjAyNC0wNS0yOVQxODo0NDozOC45ODRaIiwiaXNUd29GYWN0b3JBdXRoZW50aWNhdGVkIjpmYWxzZSwiaWF0IjoxNzE3MDA4Mjg4LCJleHAiOjE3MTcwOTQ2ODh9.6Xwkbe4a1QK6YsvVZES3-CIy0grpmxQL625fBVswqfU",
+        token = Constants.BEARER_TOKEN,
         navController = navController
+    )
+}
+
+@Preview(showBackground = true)
+@Composable
+fun ProfileStatPreview() {
+    ProfileStat(
+        label = "Followers",
+        value = "6.3k"
     )
 }

@@ -24,6 +24,7 @@ public class ProfileViewModel @Inject constructor(
             try {
                 profile = userRepository.getProfile(id, token)
             } catch (e: Exception) {
+                e.printStackTrace()
                 errorMessage = "Erreur lors du chargement du profil. Veuillez réessayer."
             }
         }
