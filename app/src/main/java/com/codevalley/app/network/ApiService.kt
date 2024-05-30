@@ -1,9 +1,11 @@
 package com.codevalley.app.network
 
-import com.codevalley.app.model.DataModel
+import com.codevalley.app.model.UserResponseDTO
 import retrofit2.http.GET
+import retrofit2.http.Header
+import retrofit2.http.Path
 
 interface ApiService {
-    @GET("endpoint")
-    suspend fun getData(): List<DataModel>
+    @GET("/auth/profile/{id}")
+    suspend fun getProfile(@Path("id") id: Int): UserResponseDTO
 }
