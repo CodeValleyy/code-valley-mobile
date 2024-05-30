@@ -18,6 +18,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.codevalley.app.R
 import com.codevalley.app.ui.theme.CodeValleyTheme
 
@@ -54,7 +55,11 @@ fun MainScreen(navController: NavHostController? = null) {
                 textAlign = TextAlign.Center
             )
             Spacer(modifier = Modifier.height(32.dp))
-            Button(onClick = { navController!!.navigate("login") }) {
+            Button(onClick = {
+                val userId = 1
+                val token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJyaWNhcmRvLmp1ZXpAZ21haWwuY29tIiwidXNlcm5hbWUiOiJjYXJsaXRvMDYwNSIsImxhc3RMb2dpbkF0IjoiMjAyNC0wNS0yOVQxODo0NDozOC45ODRaIiwiaXNUd29GYWN0b3JBdXRoZW50aWNhdGVkIjpmYWxzZSwiaWF0IjoxNzE3MDA4Mjg4LCJleHAiOjE3MTcwOTQ2ODh9.6Xwkbe4a1QK6YsvVZES3-CIy0grpmxQL625fBVswqfU"
+                navController!!.navigate("profile")
+            }) {
                 Text(text = "Get started")
             }
         }
@@ -65,6 +70,6 @@ fun MainScreen(navController: NavHostController? = null) {
 @Composable
 fun DefaultPreview() {
     CodeValleyTheme {
-        MainScreen()
+        MainScreen(navController = rememberNavController())
     }
 }
