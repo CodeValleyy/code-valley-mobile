@@ -8,6 +8,7 @@ import androidx.navigation.compose.rememberNavController
 import com.codevalley.app.ui.screens.LoginScreen
 import com.codevalley.app.ui.screens.MainScreen
 import com.codevalley.app.ui.screens.ProfileScreen
+import com.codevalley.app.utils.Constants
 
 @Composable
 fun AppNavigation(token: String) {
@@ -20,8 +21,8 @@ fun AppNavigation(token: String) {
             LoginScreen()
         }
         composable("profile") { backStackEntry ->
-            val userId = backStackEntry.arguments?.getString("userId")?.toInt() ?: 0
-            val token = backStackEntry.arguments?.getString("token") ?: ""
+            val userId = backStackEntry.arguments?.getString("userId")?.toInt() ?: 1
+            val token = backStackEntry.arguments?.getString("token") ?: Constants.BEARER_TOKEN
             ProfileScreen(
                 userId = userId,
                 token = token,
