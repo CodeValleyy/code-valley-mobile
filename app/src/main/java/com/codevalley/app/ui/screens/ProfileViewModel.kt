@@ -1,5 +1,6 @@
 package com.codevalley.app.ui.screens
 
+import android.net.Uri
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -26,6 +27,18 @@ public class ProfileViewModel @Inject constructor(
             } catch (e: Exception) {
                 e.printStackTrace()
                 errorMessage = "Erreur lors du chargement du profil. Veuillez réessayer."
+            }
+        }
+    }
+
+    fun uploadAvatar(userId: Int, fileUri: Uri, token: String) {
+        viewModelScope.launch {
+            try {
+                val avatarUrl = userRepository.uploadAvatar(userId, fileUri, token)
+                profile?.avatar = avatarUrl
+            } catch (e: Exception) {
+                e.printStackTrace()
+                errorMessage = "Erreur lors du téléchargement de l'avatar. Veuillez réessayer."
             }
         }
     }

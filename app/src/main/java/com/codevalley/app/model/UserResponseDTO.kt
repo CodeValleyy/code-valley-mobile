@@ -20,5 +20,5 @@ data class UserResponseDTO(
     val createdAt: Date,
 
     @SerializedName("avatar")
-    val avatar: String
+    var avatar: String
 )

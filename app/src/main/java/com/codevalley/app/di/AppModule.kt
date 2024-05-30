@@ -1,5 +1,7 @@
 package com.codevalley.app.di
 
+import android.app.Application
+import android.content.Context
 import com.codevalley.app.network.ApiService
 import com.codevalley.app.repository.UserRepository
 import dagger.Module
@@ -39,7 +41,13 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideUserRepository(apiService: ApiService, retrofit: Retrofit): UserRepository {
-        return UserRepository(apiService, retrofit)
+    fun provideContext(application: Application): Context {
+        return application.applicationContext
+    }
+
+    @Provides
+    @Singleton
+    fun provideUserRepository(apiService: ApiService, retrofit: Retrofit, context: Context): UserRepository {
+        return UserRepository(apiService, retrofit, context)
     }
 }

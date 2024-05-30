@@ -1,15 +1,21 @@
 package com.codevalley.app.ui.screens
 
+import android.net.Uri
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -24,7 +30,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
-import coil.compose.rememberImagePainter
 import com.codevalley.app.R
 import com.codevalley.app.utils.Constants
 
@@ -32,6 +37,16 @@ import com.codevalley.app.utils.Constants
 fun ProfileScreen(userId: Int, token: String, navController: NavController, profileViewModel: ProfileViewModel = hiltViewModel()) {
     val profileState by profileViewModel::profile
     val errorMessage by profileViewModel::errorMessage
+    var imageUri by remember { mutableStateOf<Uri?>(null) }
+
+    val imagePickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        uri?.let {
+            imageUri = it
+            profileViewModel.uploadAvatar(userId, it, token)
+        }
+    }
 
     LaunchedEffect(Unit) {
         profileViewModel.loadProfile(userId, token)
@@ -91,7 +106,9 @@ fun ProfileScreen(userId: Int, token: String, navController: NavController, prof
                     verticalArrangement = Arrangement.Center,
                     modifier = Modifier.padding(16.dp)
                 ) {
-                    val painter = if (!profile.avatar.isNullOrEmpty()) {
+                    val painter = if (imageUri != null) {
+                        rememberAsyncImagePainter(imageUri)
+                    } else if (!profile.avatar.isNullOrEmpty()) {
                         rememberAsyncImagePainter(profile.avatar)
                     } else {
                         painterResource(id = R.drawable.image)
@@ -103,10 +120,12 @@ fun ProfileScreen(userId: Int, token: String, navController: NavController, prof
                         modifier = Modifier
                             .size(100.dp)
                             .clip(CircleShape)
-                            .background(MaterialTheme.colors.surface),
+                            .background(MaterialTheme.colors.surface)
+                            .clickable {
+                                imagePickerLauncher.launch("image/*")
+                            },
                         contentScale = ContentScale.Crop
                     )
-
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
                         text = profile.username,
@@ -120,7 +139,6 @@ fun ProfileScreen(userId: Int, token: String, navController: NavController, prof
                         textAlign = TextAlign.Center
                     )
                     Spacer(modifier = Modifier.height(32.dp))
-                    // Your follow and message buttons
                     Row(
                         horizontalArrangement = Arrangement.SpaceEvenly,
                         modifier = Modifier.fillMaxWidth()
