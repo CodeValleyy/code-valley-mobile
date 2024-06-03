@@ -17,11 +17,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.codevalley.app.R
 import com.codevalley.app.ui.theme.CodeValleyTheme
 
 @Composable
-fun MainScreen() {
+fun MainScreen(navController: NavHostController? = null) {
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colors.background
@@ -53,7 +55,9 @@ fun MainScreen() {
                 textAlign = TextAlign.Center
             )
             Spacer(modifier = Modifier.height(32.dp))
-            Button(onClick = { /* TODO: Handle button click */ }) {
+            Button(onClick = {
+                navController!!.navigate("profile")
+            }) {
                 Text(text = "Get started")
             }
         }
@@ -64,6 +68,6 @@ fun MainScreen() {
 @Composable
 fun DefaultPreview() {
     CodeValleyTheme {
-        MainScreen()
+        MainScreen(navController = rememberNavController())
     }
 }
