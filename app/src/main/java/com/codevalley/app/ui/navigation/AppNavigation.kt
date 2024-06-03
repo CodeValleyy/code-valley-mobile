@@ -7,6 +7,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.codevalley.app.ui.screens.MainScreen
 import com.codevalley.app.ui.screens.ProfileScreen
+import com.codevalley.app.ui.screens.SettingsScreen
 import com.codevalley.app.utils.Constants
 
 @Composable
@@ -24,6 +25,11 @@ fun AppNavigation(token: String) {
                 token = token,
                 navController = navController
             )
+        }
+        composable("settings") {
+            SettingsScreen(
+                token = Constants.BEARER_TOKEN,
+                navController = navController)
         }
     }
 }

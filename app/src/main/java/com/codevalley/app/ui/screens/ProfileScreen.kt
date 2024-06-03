@@ -100,7 +100,7 @@ fun ProfileScreen(userId: Int, token: String, navController: NavController, prof
 
                     if (currentUser?.id == userId) {
                         IconButton(
-                            onClick = { /* TODO: Navigate to settings screen */ },
+                            onClick = { navController.navigate("settings") },
                             modifier = Modifier
                                 .align(Alignment.TopEnd)
                                 .padding(16.dp)

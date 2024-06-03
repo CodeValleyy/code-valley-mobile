@@ -10,6 +10,8 @@ import okhttp3.Request
 import retrofit2.Retrofit
 import javax.inject.Inject
 import android.net.Uri
+import com.codevalley.app.model.TfCodeAuthDto
+import com.codevalley.app.model.TokenResponse
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody.Companion.toRequestBody
 import retrofit2.HttpException
@@ -76,5 +78,28 @@ class UserRepository @Inject constructor(
             val errorBody = e.response()?.errorBody()?.string()
             throw IOException("HTTP ${e.code()} ${e.message()}: $errorBody")
         }
+    }
+
+    suspend fun turnOnTwoFactorAuthentication(token: String) {
+        val authorizedApiService = createAuthorizedApiService(token)
+        authorizedApiService.turnOnTwoFactorAuthentication()
+    }
+
+    suspend fun turnOffTwoFactorAuthentication(token: String) {
+        val authorizedApiService = createAuthorizedApiService(token)
+        authorizedApiService.turnOffTwoFactorAuthentication()
+    }
+
+    suspend fun authenticateTwoFactor(token: String, body: TfCodeAuthDto): TokenResponse {
+        val authorizedApiService = createAuthorizedApiService(token)
+        return authorizedApiService.authenticateTwoFactor(body)
+    }
+
+    suspend fun generateTwoFactor(token: String): Pair<String, String> {
+        val authorizedApiService = createAuthorizedApiService(token)
+        val response = authorizedApiService.generateTwoFactor()
+        val qrCodeUrl = response["qrCodeUrl"] ?: throw IOException("Failed to generate QR code")
+        val otpAuthUrl = response["setupKey"] ?: throw IOException("Failed to retrieve OTP URL")
+        return Pair(qrCodeUrl, otpAuthUrl)
     }
 }
