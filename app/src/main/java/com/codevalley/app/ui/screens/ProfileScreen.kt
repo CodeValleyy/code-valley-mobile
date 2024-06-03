@@ -12,7 +12,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -131,7 +130,7 @@ fun ProfileScreen(userId: Int, token: String, navController: NavController, prof
                                 .size(100.dp)
                                 .clip(CircleShape)
                                 .background(MaterialTheme.colors.surface)
-                                .clickable {
+                                .clickable(enabled = currentUser?.id == userId) {
                                     imagePickerLauncher.launch("image/*")
                                 },
                             contentScale = ContentScale.Crop
