@@ -48,6 +48,11 @@ class UserRepository @Inject constructor(
         return authorizedApiService.getProfile(id)
     }
 
+    suspend fun getMe(token: String): UserResponseDTO {
+        val authorizedApiService = createAuthorizedApiService(token)
+        return authorizedApiService.getMe()
+    }
+
     @SuppressLint("Recycle")
     @Throws(IOException::class)
     suspend fun uploadAvatar(userId: Int, fileUri: Uri, token: String): String {

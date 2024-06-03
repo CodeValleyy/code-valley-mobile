@@ -10,12 +10,11 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -36,6 +35,7 @@ import com.codevalley.app.utils.Constants
 @Composable
 fun ProfileScreen(userId: Int, token: String, navController: NavController, profileViewModel: ProfileViewModel = hiltViewModel()) {
     val profileState by profileViewModel::profile
+    val currentUser by profileViewModel::currentUser
     val errorMessage by profileViewModel::errorMessage
     var imageUri by remember { mutableStateOf<Uri?>(null) }
 
@@ -56,16 +56,14 @@ fun ProfileScreen(userId: Int, token: String, navController: NavController, prof
         navController.popBackStack()
     }
 
-    if(profileState == null && errorMessage == null) {
+    if (profileState == null && errorMessage == null) {
         Box(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
             CircularProgressIndicator()
         }
-    } else
-
-    if(errorMessage != null) {
+    } else if (errorMessage != null) {
         AlertDialog(
             onDismissRequest = { /* Do nothing */ },
             title = { Text(text = "Erreur") },
@@ -89,81 +87,92 @@ fun ProfileScreen(userId: Int, token: String, navController: NavController, prof
                 modifier = Modifier.fillMaxSize(),
                 color = MaterialTheme.colors.background
             ) {
-                Column(
+                Box(
                     modifier = Modifier.fillMaxSize()
                 ) {
-                    Button(
-                        onClick = {
-                            navController.popBackStack()
-                        },
-                        modifier = Modifier.padding(16.dp)
+                    IconButton(
+                        onClick = { navController.popBackStack() },
+                        modifier = Modifier
+                            .align(Alignment.TopStart)
+                            .padding(16.dp)
                     ) {
-                        Text("Retour")
-                    }
-                }
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center,
-                    modifier = Modifier.padding(16.dp)
-                ) {
-                    val painter = if (imageUri != null) {
-                        rememberAsyncImagePainter(imageUri)
-                    } else if (!profile.avatar.isNullOrEmpty()) {
-                        rememberAsyncImagePainter(profile.avatar)
-                    } else {
-                        painterResource(id = R.drawable.image)
+                        Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
 
-                    Image(
-                        painter = painter,
-                        contentDescription = null,
+                    if (currentUser?.id == userId) {
+                        IconButton(
+                            onClick = { /* TODO: Navigate to settings screen */ },
+                            modifier = Modifier
+                                .align(Alignment.TopEnd)
+                                .padding(16.dp)
+                        ) {
+                            Icon(imageVector = Icons.Default.Settings, contentDescription = "Settings")
+                        }
+                    }
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center,
                         modifier = Modifier
-                            .size(100.dp)
-                            .clip(CircleShape)
-                            .background(MaterialTheme.colors.surface)
-                            .clickable {
-                                imagePickerLauncher.launch("image/*")
-                            },
-                        contentScale = ContentScale.Crop
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Text(
-                        text = profile.username,
-                        style = MaterialTheme.typography.h4.copy(fontWeight = FontWeight.Bold),
-                        textAlign = TextAlign.Center
-                    )
-                    Text(
-                        text = "@${profile.username}",
-                        style = MaterialTheme.typography.body1,
-                        color = Color.Gray,
-                        textAlign = TextAlign.Center
-                    )
-                    Spacer(modifier = Modifier.height(32.dp))
-                    Row(
-                        horizontalArrangement = Arrangement.SpaceEvenly,
-                        modifier = Modifier.fillMaxWidth()
+                            .fillMaxSize()
+                            .padding(16.dp)
                     ) {
-                        Button(onClick = { /* TODO: Handle button click */ }) {
-                            Text(text = "Message")
+                        val painter = if (imageUri != null) {
+                            rememberAsyncImagePainter(imageUri)
+                        } else if (!profile.avatar.isNullOrEmpty()) {
+                            rememberAsyncImagePainter(profile.avatar)
+                        } else {
+                            painterResource(id = R.drawable.image)
                         }
-                        Button(onClick = { /* TODO: Handle button click */ }) {
-                            Text(text = "Follow")
+
+                        Image(
+                            painter = painter,
+                            contentDescription = null,
+                            modifier = Modifier
+                                .size(100.dp)
+                                .clip(CircleShape)
+                                .background(MaterialTheme.colors.surface)
+                                .clickable {
+                                    imagePickerLauncher.launch("image/*")
+                                },
+                            contentScale = ContentScale.Crop
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Text(
+                            text = profile.username,
+                            style = MaterialTheme.typography.h4.copy(fontWeight = FontWeight.Bold),
+                            textAlign = TextAlign.Center
+                        )
+                        Text(
+                            text = "@${profile.username}",
+                            style = MaterialTheme.typography.body1,
+                            color = Color.Gray,
+                            textAlign = TextAlign.Center
+                        )
+                        Spacer(modifier = Modifier.height(32.dp))
+                        Row(
+                            horizontalArrangement = Arrangement.SpaceEvenly,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Button(onClick = { /* TODO: Handle button click */ }) {
+                                Text(text = "Message")
+                            }
+                            Button(onClick = { /* TODO: Handle button click */ }) {
+                                Text(text = "Follow")
+                            }
                         }
+                        Spacer(modifier = Modifier.height(32.dp))
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceEvenly
+                        ) {
+                            ProfileStat(label = "Followers", value = "6.3k")
+                            ProfileStat(label = "Posts", value = "572")
+                            ProfileStat(label = "Following", value = "2.5k")
+                        }
+                        Spacer(modifier = Modifier.height(16.dp))
+                        // TODO: static content, replace with actual data
+                        Text("User posts here")
                     }
-                    Spacer(modifier = Modifier.height(32.dp))
-                    // Display user statistics
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceEvenly
-                    ) {
-                        ProfileStat(label = "Followers", value = "6.3k")
-                        ProfileStat(label = "Posts", value = "572")
-                        ProfileStat(label = "Following", value = "2.5k")
-                    }
-                    Spacer(modifier = Modifier.height(16.dp))
-                    // Display user posts
-                    // Example static content, replace with actual data
-                    Text("User posts here")
                 }
             }
         }

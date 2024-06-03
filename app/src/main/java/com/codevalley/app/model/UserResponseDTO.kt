@@ -20,5 +20,11 @@ data class UserResponseDTO(
     val createdAt: Date,
 
     @SerializedName("avatar")
-    var avatar: String
+    var avatar: String,
+
+    @SerializedName("twoFactorAuthenticationSecret")
+    val twoFactorAuthenticationSecret: String,
+
+    @SerializedName("isTwoFactorAuthenticationEnabled")
+    val isTwoFactorAuthenticationEnabled: Boolean
 )
