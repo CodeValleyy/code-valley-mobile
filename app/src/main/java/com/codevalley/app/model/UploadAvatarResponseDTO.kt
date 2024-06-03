@@ -1,5 +1,5 @@
 package com.codevalley.app.model
 
-class UploadAvatarResponseDTO(
+data class UploadAvatarResponseDTO(
     val avatarUrl: String
 )
