@@ -29,6 +29,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
 import com.codevalley.app.R
+import com.codevalley.app.ui.viewmodel.ProfileViewModel
 import com.codevalley.app.utils.Constants
 
 @Composable
@@ -80,7 +81,8 @@ fun ProfileScreen(userId: Int, token: String, navController: NavController, prof
                 }
             }
         )
-    } else {
+    }
+    else {
         profileState?.let { profile ->
             Surface(
                 modifier = Modifier.fillMaxSize(),
@@ -117,7 +119,7 @@ fun ProfileScreen(userId: Int, token: String, navController: NavController, prof
                     ) {
                         val painter = if (imageUri != null) {
                             rememberAsyncImagePainter(imageUri)
-                        } else if (!profile.avatar.isNullOrEmpty()) {
+                        } else if (profile.avatar.isNotEmpty()) {
                             rememberAsyncImagePainter(profile.avatar)
                         } else {
                             painterResource(id = R.drawable.image)

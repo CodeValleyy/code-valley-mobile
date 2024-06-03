@@ -1,4 +1,4 @@
-package com.codevalley.app.ui.screens
+package com.codevalley.app.ui.viewmodel
 
 import android.net.Uri
 import androidx.compose.runtime.getValue
@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-public class ProfileViewModel @Inject constructor(
+class ProfileViewModel @Inject constructor(
     private val userRepository: UserRepository
 ) : ViewModel() {
 

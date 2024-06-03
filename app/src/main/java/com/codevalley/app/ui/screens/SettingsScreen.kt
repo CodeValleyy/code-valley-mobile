@@ -20,6 +20,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.codevalley.app.ui.theme.CodeValleyTheme
+import com.codevalley.app.ui.viewmodel.SettingsViewModel
 import com.codevalley.app.utils.Constants
 
 @Composable
@@ -130,5 +131,4 @@ fun PreviewSettingsScreen() {
     CodeValleyTheme {
         SettingsScreen(Constants.BEARER_TOKEN, rememberNavController(), hiltViewModel())
     }
-
 }

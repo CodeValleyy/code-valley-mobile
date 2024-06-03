@@ -1,5 +1,6 @@
 package com.codevalley.app.network
 
+import com.codevalley.app.model.LoginRequestDTO
 import com.codevalley.app.model.TfCodeAuthDto
 import com.codevalley.app.model.TokenResponse
 import com.codevalley.app.model.UploadAvatarResponseDTO
@@ -38,6 +39,9 @@ interface ApiService {
 
     @POST("/auth/2fa/generate")
     suspend fun generateTwoFactor(): Map<String, String>
+
+    @POST("/auth/login")
+    suspend fun login(@Body loginRequest: LoginRequestDTO): TokenResponse
 
     @POST("/auth/logout")
     suspend fun logout()

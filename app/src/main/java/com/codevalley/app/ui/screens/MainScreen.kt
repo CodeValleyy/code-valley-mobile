@@ -56,7 +56,7 @@ fun MainScreen(navController: NavHostController? = null) {
             )
             Spacer(modifier = Modifier.height(32.dp))
             Button(onClick = {
-                navController!!.navigate("profile")
+                navController!!.navigate("login")
             }) {
                 Text(text = "Get started")
             }
@@ -66,7 +66,7 @@ fun MainScreen(navController: NavHostController? = null) {
 
 @Preview(showBackground = true)
 @Composable
-fun DefaultPreview() {
+fun MainScreenPreview() {
     CodeValleyTheme {
         MainScreen(navController = rememberNavController())
     }

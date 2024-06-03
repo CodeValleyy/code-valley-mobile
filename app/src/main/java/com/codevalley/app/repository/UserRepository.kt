@@ -4,12 +4,12 @@ import android.annotation.SuppressLint
 import com.codevalley.app.model.UserResponseDTO
 import com.codevalley.app.network.ApiService
 import okhttp3.MultipartBody
-import okhttp3.RequestBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import retrofit2.Retrofit
 import javax.inject.Inject
 import android.net.Uri
+import com.codevalley.app.model.LoginRequestDTO
 import com.codevalley.app.model.TfCodeAuthDto
 import com.codevalley.app.model.TokenResponse
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -106,5 +106,9 @@ class UserRepository @Inject constructor(
     suspend fun logout(token: String) {
         val authorizedApiService = createAuthorizedApiService(token)
         authorizedApiService.logout()
+    }
+
+    suspend fun login(email: String, password: String): TokenResponse {
+        return apiService.login(LoginRequestDTO(email, password))
     }
 }
