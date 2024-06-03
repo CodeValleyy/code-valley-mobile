@@ -4,7 +4,6 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.widget.Toast
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -12,24 +11,16 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.core.graphics.drawable.toBitmap
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import coil.ImageLoader
-import coil.compose.rememberAsyncImagePainter
-import coil.request.ImageRequest
-import coil.request.SuccessResult
+import com.codevalley.app.ui.theme.CodeValleyTheme
 import com.codevalley.app.utils.Constants
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
 @Composable
 fun SettingsScreen(token: String, navController: NavController, settingsViewModel: SettingsViewModel = hiltViewModel()) {
@@ -103,17 +94,18 @@ fun SettingsScreen(token: String, navController: NavController, settingsViewMode
                     }
                 }
 
+                if (errorMessage.isNotEmpty()) {
+                    Text(errorMessage, color = MaterialTheme.colors.error)
+                }
+
                 Button(
-                    onClick = { settingsViewModel.logout() },
+                    onClick = { settingsViewModel.logout(token, navController) },
                     colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.error),
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text("Log Out", color = MaterialTheme.colors.onError)
                 }
 
-                if (errorMessage.isNotEmpty()) {
-                    Text(errorMessage, color = MaterialTheme.colors.error)
-                }
             }
         }
     )
@@ -135,5 +127,8 @@ fun CopyToClipboardButton(setupKey: String) {
 @Preview
 @Composable
 fun PreviewSettingsScreen() {
-    SettingsScreen(Constants.BEARER_TOKEN, rememberNavController())
+    CodeValleyTheme {
+        SettingsScreen(Constants.BEARER_TOKEN, rememberNavController(), hiltViewModel())
+    }
+
 }

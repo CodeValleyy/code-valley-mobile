@@ -38,4 +38,7 @@ interface ApiService {
 
     @POST("/auth/2fa/generate")
     suspend fun generateTwoFactor(): Map<String, String>
+
+    @POST("/auth/logout")
+    suspend fun logout()
 }

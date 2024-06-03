@@ -2,6 +2,7 @@ package com.codevalley.app.ui.screens
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.NavController
 import com.codevalley.app.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -63,7 +64,17 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-    fun logout() {
-
+    fun logout(token: String, navController: NavController) {
+        viewModelScope.launch {
+            try {
+                userRepository.logout(token)
+                navController.navigate("main") {
+                    popUpTo("main") { inclusive = true }
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                _errorMessage.value = "Failed to logout."
+            }
+        }
     }
 }

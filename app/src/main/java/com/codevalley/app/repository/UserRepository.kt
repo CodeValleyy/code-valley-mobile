@@ -102,4 +102,9 @@ class UserRepository @Inject constructor(
         val otpAuthUrl = response["setupKey"] ?: throw IOException("Failed to retrieve OTP URL")
         return Pair(qrCodeUrl, otpAuthUrl)
     }
+
+    suspend fun logout(token: String) {
+        val authorizedApiService = createAuthorizedApiService(token)
+        authorizedApiService.logout()
+    }
 }
