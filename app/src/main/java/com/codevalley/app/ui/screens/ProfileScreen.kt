@@ -91,7 +91,11 @@ fun ProfileScreen(userId: Int, navController: NavController, profileViewModel: P
                     modifier = Modifier.fillMaxSize()
                 ) {
                     IconButton(
-                        onClick = { navController.popBackStack() },
+                        onClick = {
+                            if (!navController.popBackStack()) {
+                                navController.navigate("main")
+                            }
+                        },
                         modifier = Modifier
                             .align(Alignment.TopStart)
                             .padding(16.dp)

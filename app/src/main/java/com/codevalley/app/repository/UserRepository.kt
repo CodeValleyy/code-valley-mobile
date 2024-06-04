@@ -8,42 +8,30 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import retrofit2.Retrofit
 import javax.inject.Inject
+import android.content.Context
 import android.net.Uri
 import com.codevalley.app.model.LoginRequestDTO
 import com.codevalley.app.model.TfCodeAuthDto
 import com.codevalley.app.model.TokenResponse
 import com.codevalley.app.utils.TokenManager
+import com.codevalley.app.model.UserResponseDTO
+import com.codevalley.app.network.AuthService
+import com.codevalley.app.network.createAuthorizedApiService
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
-import retrofit2.HttpException
+import retrofit2.Retrofit
 import java.io.IOException
 import java.util.Date
-
+import javax.inject.Inject
 
 class UserRepository @Inject constructor(
-    private val apiService: ApiService,
     private val retrofit: Retrofit,
-    private val context: android.content.Context
+    private val context: Context
 ) {
 
-    private fun createAuthorizedApiService(): ApiService {
-        val authInterceptor = okhttp3.Interceptor { chain ->
-            val original = chain.request()
-            val requestBuilder: Request.Builder = original.newBuilder()
-                .header("Authorization", "Bearer ${TokenManager.token.toString()}")
-            val request: Request = requestBuilder.build()
-            chain.proceed(request)
-        }
-
-        val client: Retrofit = retrofit.newBuilder()
-            .client(
-                OkHttpClient.Builder()
-                    .addInterceptor(authInterceptor)
-                    .build()
-            )
-            .build()
-
-        return client.create(ApiService::class.java)
+    private fun createAuthorizedApiService(token: String): AuthService {
+        return createAuthorizedApiService(token, retrofit, AuthService::class.java)
     }
 
     suspend fun getProfile(id: Int): UserResponseDTO {
@@ -69,13 +57,12 @@ class UserRepository @Inject constructor(
             ?: throw IOException("Unable to open input stream for URI: $fileUri")
         val fileBytes = inputStream.readBytes()
         val fileRequestBody = fileBytes.toRequestBody(mimeType?.toMediaTypeOrNull())
-        val filePart =
-            MultipartBody.Part.createFormData("file", "avatar-${Date().time}.jpg", fileRequestBody)
+        val filePart = MultipartBody.Part.createFormData("file", "avatar-${Date().time}.jpg", fileRequestBody)
 
         return try {
             val response = authorizedApiService.uploadAvatar(userIdRequestBody, filePart)
             response.avatarUrl
-        } catch (e: HttpException) {
+        } catch (e: retrofit2.HttpException) {
             val errorBody = e.response()?.errorBody()?.string()
             throw IOException("HTTP ${e.code()} ${e.message()}: $errorBody")
         }
