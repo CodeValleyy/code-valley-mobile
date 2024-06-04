@@ -4,6 +4,7 @@ import android.app.Application
 import android.content.Context
 import com.codevalley.app.network.ApiService
 import com.codevalley.app.repository.UserRepository
+import com.codevalley.app.utils.Constants
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -27,7 +28,9 @@ object AppModule {
     @Singleton
     fun provideRetrofit(client: OkHttpClient): Retrofit {
         return Retrofit.Builder()
-            .baseUrl("http://10.0.2.2:3000")
+            .baseUrl(
+                Constants.BASE_URL
+            )
             .client(client)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
