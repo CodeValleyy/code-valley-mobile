@@ -18,7 +18,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Button
 import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.MaterialTheme.colors
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
@@ -43,13 +42,14 @@ import androidx.navigation.compose.rememberNavController
 import com.codevalley.app.R
 import com.codevalley.app.ui.navigation.ScreenName
 import com.codevalley.app.ui.theme.CodeValleyTheme
-import com.codevalley.app.ui.viewmodel.LoginViewModel
+import com.codevalley.app.ui.viewmodel.RegisterViewModel
 
 @Composable
-fun LoginScreen(navController: NavController, loginViewModel: LoginViewModel = hiltViewModel()) {
-    val registerText = buildAnnotatedString {
+fun RegisterScreen(navController: NavController, registerViewModel: RegisterViewModel = hiltViewModel()) {
+
+    val loginText = buildAnnotatedString {
         withStyle(style = SpanStyle(color = Color.Blue, textDecoration = TextDecoration.Underline)) {
-            append("Register")
+            append("Log in")
         }
     }
 
@@ -59,7 +59,7 @@ fun LoginScreen(navController: NavController, loginViewModel: LoginViewModel = h
 
     Surface(
         modifier = Modifier.fillMaxSize(),
-        color = colors.background
+        color = MaterialTheme.colors.background
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -67,21 +67,21 @@ fun LoginScreen(navController: NavController, loginViewModel: LoginViewModel = h
             modifier = Modifier.padding(32.dp)
         ) {
             Text(
-                text = "Hello Again!",
+                text = "Welcome!",
                 style = MaterialTheme.typography.h3,
                 textAlign = TextAlign.Center,
                 fontWeight = FontWeight.Bold
             )
             Text(
-                text = "Sign in to your account",
+                text = "Create your account",
                 textAlign = TextAlign.Center,
                 color = Color.Gray
             )
             Spacer(modifier = Modifier.height(48.dp))
             TextField(
-                value = loginViewModel.email,
-                onValueChange = { newText -> loginViewModel.email = newText },
-                label = { Text("Enter your email address") },
+                value = registerViewModel.username,
+                onValueChange = { newText -> registerViewModel.username = newText },
+                label = { Text("Enter your username") },
                 keyboardOptions = KeyboardOptions.Default.copy(
                     keyboardType = KeyboardType.Email,
                     imeAction = ImeAction.Next
@@ -90,9 +90,31 @@ fun LoginScreen(navController: NavController, loginViewModel: LoginViewModel = h
             )
             Spacer(modifier = Modifier.height(16.dp))
             TextField(
-                value = loginViewModel.password,
-                onValueChange = { newText -> loginViewModel.password = newText },
+                value = registerViewModel.email,
+                onValueChange = { newText -> registerViewModel.email = newText },
+                label = { Text("Enter your email address") },
+                keyboardOptions = KeyboardOptions.Default.copy(
+                    keyboardType = KeyboardType.Password,
+                    imeAction = ImeAction.Done
+                ),
+                modifier = Modifier.fillMaxWidth()
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            TextField(
+                value = registerViewModel.password,
+                onValueChange = { newText -> registerViewModel.password = newText },
                 label = { Text("Enter your password") },
+                keyboardOptions = KeyboardOptions.Default.copy(
+                    keyboardType = KeyboardType.Password,
+                    imeAction = ImeAction.Done
+                ),
+                modifier = Modifier.fillMaxWidth()
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            TextField(
+                value = registerViewModel.samePassword,
+                onValueChange = { newText -> registerViewModel.samePassword = newText },
+                label = { Text("Confirm your password") },
                 keyboardOptions = KeyboardOptions.Default.copy(
                     keyboardType = KeyboardType.Password,
                     imeAction = ImeAction.Done
@@ -101,13 +123,13 @@ fun LoginScreen(navController: NavController, loginViewModel: LoginViewModel = h
             )
             Spacer(modifier = Modifier.height(20.dp))
             Text(
-                text = loginViewModel.errorMessage,
+                text = registerViewModel.errorMessage,
                 color = Color.Red
             )
             Spacer(modifier = Modifier.height(20.dp))
             Button(
                 onClick = {
-                    if (loginViewModel.login()) {
+                    if (registerViewModel.register()) {
                         navController.navigate(ScreenName.Profile.toString())
                     }
                 },
@@ -115,7 +137,7 @@ fun LoginScreen(navController: NavController, loginViewModel: LoginViewModel = h
                 shape = RoundedCornerShape(8.dp),
                 contentPadding = PaddingValues(20.dp),
             ) {
-                Text(text = "Log in")
+                Text(text = "Register")
             }
             Spacer(modifier = Modifier.height(24.dp))
             Row(
@@ -137,35 +159,35 @@ fun LoginScreen(navController: NavController, loginViewModel: LoginViewModel = h
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Button(
-                    onClick = { loginViewModel.errorMessage = "Google authentication is not available" },
+                    onClick = { registerViewModel.errorMessage = "Google authentication is not available" },
                     modifier = Modifier.size(48.dp),
                     shape = RoundedCornerShape(24.dp),
                 ) {
                     Image(
                         painter = painterResource(id = R.drawable.google_icon),
-                        contentDescription = "Log in with Google",
+                        contentDescription = "Register in with Google",
                         modifier = Modifier.size(24.dp)
                     )
                 }
                 Button(
-                    onClick = { loginViewModel.errorMessage = "Microsoft authentication is not available"  },
+                    onClick = { registerViewModel.errorMessage = "Microsoft authentication is not available"  },
                     modifier = Modifier.size(48.dp),
                     shape = RoundedCornerShape(24.dp),
                 ) {
                     Image(
                         painter = painterResource(id = R.drawable.microsoft_icon),
-                        contentDescription = "Log in with Microsoft",
+                        contentDescription = "Register in with Microsoft",
                         modifier = Modifier.size(24.dp)
                     )
                 }
                 Button(
-                    onClick = { loginViewModel.errorMessage = "Apple authentication is not available"  },
+                    onClick = { registerViewModel.errorMessage = "Apple authentication is not available"  },
                     modifier = Modifier.size(48.dp),
                     shape = RoundedCornerShape(24.dp),
                 ) {
                     Image(
                         painter = painterResource(id = R.drawable.apple_icon),
-                        contentDescription = "Log in with Apple",
+                        contentDescription = "Register with Apple",
                         modifier = Modifier.size(24.dp)
                     )
                 }
@@ -177,13 +199,13 @@ fun LoginScreen(navController: NavController, loginViewModel: LoginViewModel = h
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Don't have an account? Let's ",
+                    text = "Already have an account? Let's ",
                     textAlign = TextAlign.Center,
                     color = Color.Gray
                 )
                 ClickableText(
-                    text = registerText,
-                    onClick = { _ -> navController.navigate(ScreenName.Register.toString()) }
+                    text = loginText,
+                    onClick = { _ -> navController.navigate(ScreenName.Login.toString()) }
                 )
             }
         }
@@ -192,8 +214,8 @@ fun LoginScreen(navController: NavController, loginViewModel: LoginViewModel = h
 
 @Preview(showBackground = true)
 @Composable
-fun LoginScreenPreview() {
+fun RegisterScreenPreview() {
     CodeValleyTheme {
-        LoginScreen(rememberNavController())
+        RegisterScreen(rememberNavController())
     }
 }

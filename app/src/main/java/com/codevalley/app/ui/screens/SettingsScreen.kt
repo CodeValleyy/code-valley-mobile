@@ -106,7 +106,6 @@ fun SettingsScreen(navController: NavController, settingsViewModel: SettingsView
                 ) {
                     Text("Log Out", color = MaterialTheme.colors.onError)
                 }
-
             }
         }
     )

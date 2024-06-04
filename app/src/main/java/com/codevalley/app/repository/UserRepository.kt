@@ -8,6 +8,7 @@ import javax.inject.Inject
 import android.content.Context
 import android.net.Uri
 import com.codevalley.app.model.LoginRequestDTO
+import com.codevalley.app.model.RegisterRequestDTO
 import com.codevalley.app.model.TfCodeAuthDto
 import com.codevalley.app.model.TokenResponse
 import com.codevalley.app.network.AuthService
@@ -95,5 +96,9 @@ class UserRepository @Inject constructor(
 
     suspend fun login(email: String, password: String): TokenResponse {
         return authService.login(LoginRequestDTO(email, password))
+    }
+
+    suspend fun register(username: String, email: String, password: String): TokenResponse {
+        return authService.register(RegisterRequestDTO(username, email, password))
     }
 }

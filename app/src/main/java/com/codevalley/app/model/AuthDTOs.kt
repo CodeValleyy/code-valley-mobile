@@ -11,3 +11,14 @@ data class TokenResponse(
 data class UploadAvatarResponseDTO(
     val avatarUrl: String
 )
+
+data class LoginRequestDTO(
+    val email: String,
+    val password: String
+)
+
+data class RegisterRequestDTO(
+    val username: String,
+    val email: String,
+    val password: String
+)

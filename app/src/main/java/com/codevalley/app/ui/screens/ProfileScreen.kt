@@ -29,6 +29,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
 import com.codevalley.app.R
+import com.codevalley.app.ui.navigation.ScreenName
 import com.codevalley.app.ui.viewmodel.ProfileViewModel
 
 @Composable
@@ -71,8 +72,8 @@ fun ProfileScreen(userId: Int, navController: NavController, profileViewModel: P
                 Button(
                     onClick = {
                         profileViewModel.errorMessage = null
-                        navController.navigate("main") {
-                            popUpTo("profile") { inclusive = true }
+                        navController.navigate(ScreenName.Main.toString()) {
+                            popUpTo(ScreenName.Profile.toString()) { inclusive = true }
                         }
                     }
                 ) {
@@ -93,7 +94,7 @@ fun ProfileScreen(userId: Int, navController: NavController, profileViewModel: P
                     IconButton(
                         onClick = {
                             if (!navController.popBackStack()) {
-                                navController.navigate("main")
+                                navController.navigate(ScreenName.Main.toString())
                             }
                         },
                         modifier = Modifier
@@ -105,7 +106,7 @@ fun ProfileScreen(userId: Int, navController: NavController, profileViewModel: P
 
                     if (currentUser?.id == userId) {
                         IconButton(
-                            onClick = { navController.navigate("settings") },
+                            onClick = { navController.navigate(ScreenName.Settings.toString()) },
                             modifier = Modifier
                                 .align(Alignment.TopEnd)
                                 .padding(16.dp)
