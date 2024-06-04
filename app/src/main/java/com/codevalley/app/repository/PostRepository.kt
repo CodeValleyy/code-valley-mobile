@@ -14,32 +14,32 @@ class PostRepository @Inject constructor(
     private val context: Context
 ) {
 
-    private fun createAuthorizedApiService(token: String): PostService {
-        return createAuthorizedApiService(token, retrofit, PostService::class.java)
+    private fun createAuthorizedApiService(): PostService {
+        return createAuthorizedApiService(retrofit, PostService::class.java)
     }
 
-    suspend fun getPosts(token: String): List<PostResponseDto> {
-        val authorizedApiService = createAuthorizedApiService(token)
+    suspend fun getPosts(): List<PostResponseDto> {
+        val authorizedApiService = createAuthorizedApiService()
         return authorizedApiService.getPosts()
     }
 
-    suspend fun createPost(token: String, createPostDto: CreatePostDto): PostResponseDto {
-        val authorizedApiService = createAuthorizedApiService(token)
+    suspend fun createPost(createPostDto: CreatePostDto): PostResponseDto {
+        val authorizedApiService = createAuthorizedApiService()
         return authorizedApiService.createPost(createPostDto)
     }
 
-    suspend fun deletePost(token: String, id: Int) {
-        val authorizedApiService = createAuthorizedApiService(token)
+    suspend fun deletePost(id: Int) {
+        val authorizedApiService = createAuthorizedApiService()
         authorizedApiService.deletePost(id)
     }
 
-    suspend fun likePost(token: String, id: Int): LikePostResponseDto {
-        val authorizedApiService = createAuthorizedApiService(token)
+    suspend fun likePost(id: Int): LikePostResponseDto {
+        val authorizedApiService = createAuthorizedApiService()
         return authorizedApiService.likePost(id)
     }
 
-    suspend fun unlikePost(token: String, id: Int): LikePostResponseDto {
-        val authorizedApiService = createAuthorizedApiService(token)
+    suspend fun unlikePost(id: Int): LikePostResponseDto {
+        val authorizedApiService = createAuthorizedApiService()
         return authorizedApiService.unlikePost(id)
     }
 }

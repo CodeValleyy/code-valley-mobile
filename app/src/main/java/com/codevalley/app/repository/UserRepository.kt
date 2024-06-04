@@ -2,10 +2,7 @@ package com.codevalley.app.repository
 
 import android.annotation.SuppressLint
 import com.codevalley.app.model.UserResponseDTO
-import com.codevalley.app.network.ApiService
 import okhttp3.MultipartBody
-import okhttp3.OkHttpClient
-import okhttp3.Request
 import retrofit2.Retrofit
 import javax.inject.Inject
 import android.content.Context
@@ -13,25 +10,25 @@ import android.net.Uri
 import com.codevalley.app.model.LoginRequestDTO
 import com.codevalley.app.model.TfCodeAuthDto
 import com.codevalley.app.model.TokenResponse
-import com.codevalley.app.utils.TokenManager
-import com.codevalley.app.model.UserResponseDTO
 import com.codevalley.app.network.AuthService
 import com.codevalley.app.network.createAuthorizedApiService
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
-import okhttp3.MultipartBody
+import okhttp3.OkHttpClient
 import okhttp3.RequestBody.Companion.toRequestBody
-import retrofit2.Retrofit
 import java.io.IOException
 import java.util.Date
-import javax.inject.Inject
 
 class UserRepository @Inject constructor(
     private val retrofit: Retrofit,
     private val context: Context
 ) {
+    private val authService = retrofit.newBuilder()
+        .client(OkHttpClient.Builder().build())
+        .build()
+        .create(AuthService::class.java)
 
-    private fun createAuthorizedApiService(token: String): AuthService {
-        return createAuthorizedApiService(token, retrofit, AuthService::class.java)
+    private fun createAuthorizedApiService(): AuthService {
+        return createAuthorizedApiService(retrofit, AuthService::class.java)
     }
 
     suspend fun getProfile(id: Int): UserResponseDTO {
@@ -97,6 +94,6 @@ class UserRepository @Inject constructor(
     }
 
     suspend fun login(email: String, password: String): TokenResponse {
-        return apiService.login(LoginRequestDTO(email, password))
+        return authService.login(LoginRequestDTO(email, password))
     }
 }

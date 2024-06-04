@@ -12,57 +12,57 @@ class FriendshipRepository @Inject constructor(
     private val retrofit: Retrofit
 ) {
 
-    private fun createAuthorizedApiService(token: String): FriendshipService {
-        return createAuthorizedApiService(token, retrofit, FriendshipService::class.java)
+    private fun createAuthorizedApiService(): FriendshipService {
+        return createAuthorizedApiService(retrofit, FriendshipService::class.java)
     }
 
-        suspend fun sendFriendRequest(receiverId: Int, token: String): FriendshipResponseDTO {
-        val friendshipService = createAuthorizedApiService(token)
+        suspend fun sendFriendRequest(receiverId: Int): FriendshipResponseDTO {
+        val friendshipService = createAuthorizedApiService()
         return friendshipService.sendFriendRequest(receiverId)
     }
 
-    suspend fun acceptFriendRequest(friendshipId: Int, token: String): FriendshipResponseDTO {
-        val friendshipService = createAuthorizedApiService(token)
+    suspend fun acceptFriendRequest(friendshipId: Int): FriendshipResponseDTO {
+        val friendshipService = createAuthorizedApiService()
         return friendshipService.acceptFriendRequest(friendshipId)
     }
 
-    suspend fun declineFriendRequest(friendshipId: Int, token: String) {
-        val friendshipService = createAuthorizedApiService(token)
+    suspend fun declineFriendRequest(friendshipId: Int) {
+        val friendshipService = createAuthorizedApiService()
         friendshipService.declineFriendRequest(friendshipId)
     }
 
-    suspend fun removeFriend(friendId: Int, token: String) {
-        val friendshipService = createAuthorizedApiService(token)
+    suspend fun removeFriend(friendId: Int) {
+        val friendshipService = createAuthorizedApiService()
         friendshipService.removeFriend(friendId)
     }
 
-    suspend fun listPendingRequests(token: String): List<UserFriendDTO> {
-        val friendshipService = createAuthorizedApiService(token)
+    suspend fun listPendingRequests(): List<UserFriendDTO> {
+        val friendshipService = createAuthorizedApiService()
         return friendshipService.listPendingRequests()
     }
 
-    suspend fun listSentRequests(token: String): List<UserFriendDTO> {
-        val friendshipService = createAuthorizedApiService(token)
+    suspend fun listSentRequests(): List<UserFriendDTO> {
+        val friendshipService = createAuthorizedApiService()
         return friendshipService.listSentRequests()
     }
 
-    suspend fun cancelFriendRequest(receiverId: Int, token: String) {
-        val friendshipService = createAuthorizedApiService(token)
+    suspend fun cancelFriendRequest(receiverId: Int) {
+        val friendshipService = createAuthorizedApiService()
         friendshipService.cancelFriendRequest(receiverId)
     }
 
-    suspend fun listFriends(token: String): List<UserFriendDTO> {
-        val friendshipService = createAuthorizedApiService(token)
+    suspend fun listFriends(): List<UserFriendDTO> {
+        val friendshipService = createAuthorizedApiService()
         return friendshipService.listFriends()
     }
 
-    suspend fun getFriendshipStatus(friendId: Int, token: String): FriendshipResponseDTO {
-        val friendshipService = createAuthorizedApiService(token)
+    suspend fun getFriendshipStatus(friendId: Int): FriendshipResponseDTO {
+        val friendshipService = createAuthorizedApiService()
         return friendshipService.getFriendshipStatus(friendId)
     }
 
-    suspend fun listFriendSuggestions(token: String): List<UserQueryDTO> {
-        val friendshipService = createAuthorizedApiService(token)
+    suspend fun listFriendSuggestions(): List<UserQueryDTO> {
+        val friendshipService = createAuthorizedApiService()
         return friendshipService.listFriendSuggestions()
     }
 }
