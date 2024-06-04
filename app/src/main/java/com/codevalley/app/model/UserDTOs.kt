@@ -3,6 +3,18 @@ package com.codevalley.app.model
 import com.google.gson.annotations.SerializedName
 import java.util.Date
 
+data class UserFriendDTO(
+    val id: Int,
+    val email: String,
+    val username: String
+)
+
+data class UserQueryDTO(
+    val id: Int,
+    val email: String,
+    val username: String
+)
+
 data class UserResponseDTO(
     @SerializedName("id")
     val id: Int,

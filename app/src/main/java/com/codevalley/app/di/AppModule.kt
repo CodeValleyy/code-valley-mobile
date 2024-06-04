@@ -2,7 +2,11 @@ package com.codevalley.app.di
 
 import android.app.Application
 import android.content.Context
-import com.codevalley.app.network.ApiService
+import com.codevalley.app.network.AuthService
+import com.codevalley.app.network.FriendshipService
+import com.codevalley.app.network.GroupService
+import com.codevalley.app.repository.FriendshipRepository
+import com.codevalley.app.repository.GroupRepository
 import com.codevalley.app.repository.UserRepository
 import com.codevalley.app.utils.Constants
 import dagger.Module
@@ -38,8 +42,20 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideApiService(retrofit: Retrofit): ApiService {
-        return retrofit.create(ApiService::class.java)
+    fun provideAuthService(retrofit: Retrofit): AuthService {
+        return retrofit.create(AuthService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideFriendshipService(retrofit: Retrofit): FriendshipService {
+        return retrofit.create(FriendshipService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideGroupService(retrofit: Retrofit): GroupService {
+        return retrofit.create(GroupService::class.java)
     }
 
     @Provides
@@ -50,7 +66,20 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideUserRepository(apiService: ApiService, retrofit: Retrofit, context: Context): UserRepository {
-        return UserRepository(apiService, retrofit, context)
+    fun provideUserRepository(retrofit: Retrofit, context: Context): UserRepository {
+        return UserRepository(retrofit, context)
     }
+
+    @Provides
+    @Singleton
+    fun provideFriendshipRepository(retrofit: Retrofit): FriendshipRepository {
+        return FriendshipRepository(retrofit)
+    }
+
+    @Provides
+    @Singleton
+    fun provideGroupRepository(retrofit: Retrofit): GroupRepository {
+        return GroupRepository(retrofit)
+    }
+
 }
