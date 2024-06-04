@@ -21,20 +21,23 @@ class UserRepository @Inject constructor(
     private val context: Context
 ) {
 
+    private fun createAuthorizedApiService(token: String): AuthService {
+        return createAuthorizedApiService(token, retrofit, AuthService::class.java)
+    }
     suspend fun getProfile(id: Int, token: String): UserResponseDTO {
-        val authorizedApiService = createAuthorizedApiService(token, retrofit, AuthService::class.java)
+        val authorizedApiService = createAuthorizedApiService(token)
         return authorizedApiService.getProfile(id)
     }
 
     suspend fun getMe(token: String): UserResponseDTO {
-        val authorizedApiService = createAuthorizedApiService(token, retrofit, AuthService::class.java)
+        val authorizedApiService = createAuthorizedApiService(token)
         return authorizedApiService.getMe()
     }
 
     @SuppressLint("Recycle")
     @Throws(IOException::class)
     suspend fun uploadAvatar(userId: Int, fileUri: Uri, token: String): String {
-        val authorizedApiService = createAuthorizedApiService(token, retrofit, AuthService::class.java)
+        val authorizedApiService = createAuthorizedApiService(token)
 
         val userIdRequestBody = userId.toString().toRequestBody(MultipartBody.FORM)
         val contentResolver = context.contentResolver
@@ -56,22 +59,22 @@ class UserRepository @Inject constructor(
     }
 
     suspend fun turnOnTwoFactorAuthentication(token: String) {
-        val authorizedApiService = createAuthorizedApiService(token, retrofit, AuthService::class.java)
+        val authorizedApiService = createAuthorizedApiService(token)
         authorizedApiService.turnOnTwoFactorAuthentication()
     }
 
     suspend fun turnOffTwoFactorAuthentication(token: String) {
-        val authorizedApiService = createAuthorizedApiService(token, retrofit, AuthService::class.java)
+        val authorizedApiService = createAuthorizedApiService(token)
         authorizedApiService.turnOffTwoFactorAuthentication()
     }
 
     suspend fun authenticateTwoFactor(token: String, body: TfCodeAuthDto): TokenResponse {
-        val authorizedApiService = createAuthorizedApiService(token, retrofit, AuthService::class.java)
+        val authorizedApiService = createAuthorizedApiService(token)
         return authorizedApiService.authenticateTwoFactor(body)
     }
 
     suspend fun generateTwoFactor(token: String): Pair<String, String> {
-        val authorizedApiService = createAuthorizedApiService(token, retrofit, AuthService::class.java)
+        val authorizedApiService = createAuthorizedApiService(token)
         val response = authorizedApiService.generateTwoFactor()
         val qrCodeUrl = response["qrCodeUrl"] ?: throw IOException("Failed to generate QR code")
         val otpAuthUrl = response["setupKey"] ?: throw IOException("Failed to retrieve OTP URL")
@@ -79,7 +82,7 @@ class UserRepository @Inject constructor(
     }
 
     suspend fun logout(token: String) {
-        val authorizedApiService = createAuthorizedApiService(token, retrofit, AuthService::class.java)
+        val authorizedApiService = createAuthorizedApiService(token)
         authorizedApiService.logout()
     }
 }
