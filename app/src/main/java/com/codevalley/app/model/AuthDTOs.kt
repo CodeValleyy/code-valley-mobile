@@ -11,4 +11,3 @@ data class TokenResponse(
 data class UploadAvatarResponseDTO(
     val avatarUrl: String
 )
-
