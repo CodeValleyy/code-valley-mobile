@@ -30,10 +30,9 @@ import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
 import com.codevalley.app.R
 import com.codevalley.app.ui.viewmodel.ProfileViewModel
-import com.codevalley.app.utils.Constants
 
 @Composable
-fun ProfileScreen(userId: Int, token: String, navController: NavController, profileViewModel: ProfileViewModel = hiltViewModel()) {
+fun ProfileScreen(userId: Int, navController: NavController, profileViewModel: ProfileViewModel = hiltViewModel()) {
     val profileState by profileViewModel::profile
     val currentUser by profileViewModel::currentUser
     val errorMessage by profileViewModel::errorMessage
@@ -44,12 +43,12 @@ fun ProfileScreen(userId: Int, token: String, navController: NavController, prof
     ) { uri: Uri? ->
         uri?.let {
             imageUri = it
-            profileViewModel.uploadAvatar(userId, it, token)
+            profileViewModel.uploadAvatar(userId, it)
         }
     }
 
     LaunchedEffect(Unit) {
-        profileViewModel.loadProfile(userId, token)
+        profileViewModel.loadProfile(userId)
     }
 
     BackHandler {
@@ -204,7 +203,6 @@ fun ProfileScreenPreview() {
     val navController = rememberNavController()
     ProfileScreen(
         userId = 1,
-        token = Constants.BEARER_TOKEN,
         navController = navController
     )
 }

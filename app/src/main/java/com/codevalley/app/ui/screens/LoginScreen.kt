@@ -1,5 +1,6 @@
 package com.codevalley.app.ui.screens
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -41,12 +42,14 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.codevalley.app.R
 import com.codevalley.app.ui.theme.CodeValleyTheme
 import com.codevalley.app.ui.viewmodel.LoginViewModel
 
 @Composable
-fun LoginScreen(loginViewModel: LoginViewModel = hiltViewModel()) {
+fun LoginScreen(navController: NavController, loginViewModel: LoginViewModel = hiltViewModel()) {
     var emailAddress by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
@@ -71,6 +74,10 @@ fun LoginScreen(loginViewModel: LoginViewModel = hiltViewModel()) {
             start = 0,
             end = 10
         )
+    }
+
+    BackHandler {
+        navController.popBackStack()
     }
 
     Surface(
@@ -122,7 +129,11 @@ fun LoginScreen(loginViewModel: LoginViewModel = hiltViewModel()) {
             )
             Spacer(modifier = Modifier.height(20.dp))
             Button(
-                onClick = { loginViewModel.login(emailAddress, password) },
+                onClick = {
+                    if (loginViewModel.login(emailAddress, password)) {
+                        navController.navigate("profile")
+                    }
+                },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(8.dp),
                 contentPadding = PaddingValues(20.dp),
@@ -212,6 +223,6 @@ fun LoginScreen(loginViewModel: LoginViewModel = hiltViewModel()) {
 @Composable
 fun LoginScreenPreview() {
     CodeValleyTheme {
-        LoginScreen()
+        LoginScreen(rememberNavController())
     }
 }

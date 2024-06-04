@@ -24,7 +24,7 @@ import com.codevalley.app.ui.viewmodel.SettingsViewModel
 import com.codevalley.app.utils.Constants
 
 @Composable
-fun SettingsScreen(token: String, navController: NavController, settingsViewModel: SettingsViewModel = hiltViewModel()) {
+fun SettingsScreen(navController: NavController, settingsViewModel: SettingsViewModel = hiltViewModel()) {
     val isTwoFactorEnabled by settingsViewModel.isTwoFactorEnabled.collectAsState()
     val qrCodeUrl by settingsViewModel.qrCodeUrl.collectAsState()
     val setupKey by settingsViewModel.setupKey.collectAsState()
@@ -32,7 +32,7 @@ fun SettingsScreen(token: String, navController: NavController, settingsViewMode
 
 
     LaunchedEffect(Unit) {
-        settingsViewModel.loadTwoFactorStatus(token)
+        settingsViewModel.loadTwoFactorStatus()
     }
 
     Scaffold(
@@ -68,9 +68,9 @@ fun SettingsScreen(token: String, navController: NavController, settingsViewMode
                             checked = isTwoFactorEnabled,
                             onCheckedChange = { checked ->
                                 if (checked) {
-                                    settingsViewModel.enableTwoFactor(token)
+                                    settingsViewModel.enableTwoFactor()
                                 } else {
-                                    settingsViewModel.disableTwoFactor(token)
+                                    settingsViewModel.disableTwoFactor()
                                 }
                             }
                         )
@@ -100,7 +100,7 @@ fun SettingsScreen(token: String, navController: NavController, settingsViewMode
                 }
 
                 Button(
-                    onClick = { settingsViewModel.logout(token, navController) },
+                    onClick = { settingsViewModel.logout(navController) },
                     colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.error),
                     modifier = Modifier.fillMaxWidth()
                 ) {
@@ -129,6 +129,6 @@ fun CopyToClipboardButton(setupKey: String) {
 @Composable
 fun PreviewSettingsScreen() {
     CodeValleyTheme {
-        SettingsScreen(Constants.BEARER_TOKEN, rememberNavController(), hiltViewModel())
+        SettingsScreen(rememberNavController(), hiltViewModel())
     }
 }

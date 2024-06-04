@@ -12,6 +12,7 @@ import android.net.Uri
 import com.codevalley.app.model.LoginRequestDTO
 import com.codevalley.app.model.TfCodeAuthDto
 import com.codevalley.app.model.TokenResponse
+import com.codevalley.app.utils.TokenManager
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody.Companion.toRequestBody
 import retrofit2.HttpException
@@ -25,11 +26,11 @@ class UserRepository @Inject constructor(
     private val context: android.content.Context
 ) {
 
-    private fun createAuthorizedApiService(token: String): ApiService {
+    private fun createAuthorizedApiService(): ApiService {
         val authInterceptor = okhttp3.Interceptor { chain ->
             val original = chain.request()
             val requestBuilder: Request.Builder = original.newBuilder()
-                .header("Authorization", "Bearer $token")
+                .header("Authorization", "Bearer ${TokenManager.token.toString()}")
             val request: Request = requestBuilder.build()
             chain.proceed(request)
         }
@@ -45,20 +46,20 @@ class UserRepository @Inject constructor(
         return client.create(ApiService::class.java)
     }
 
-    suspend fun getProfile(id: Int, token: String): UserResponseDTO {
-        val authorizedApiService = createAuthorizedApiService(token)
+    suspend fun getProfile(id: Int): UserResponseDTO {
+        val authorizedApiService = createAuthorizedApiService()
         return authorizedApiService.getProfile(id)
     }
 
-    suspend fun getMe(token: String): UserResponseDTO {
-        val authorizedApiService = createAuthorizedApiService(token)
+    suspend fun getMe(): UserResponseDTO {
+        val authorizedApiService = createAuthorizedApiService()
         return authorizedApiService.getMe()
     }
 
     @SuppressLint("Recycle")
     @Throws(IOException::class)
-    suspend fun uploadAvatar(userId: Int, fileUri: Uri, token: String): String {
-        val authorizedApiService = createAuthorizedApiService(token)
+    suspend fun uploadAvatar(userId: Int, fileUri: Uri): String {
+        val authorizedApiService = createAuthorizedApiService()
 
         val userIdRequestBody = userId.toString().toRequestBody(MultipartBody.FORM)
         val contentResolver = context.contentResolver
@@ -80,31 +81,31 @@ class UserRepository @Inject constructor(
         }
     }
 
-    suspend fun turnOnTwoFactorAuthentication(token: String) {
-        val authorizedApiService = createAuthorizedApiService(token)
+    suspend fun turnOnTwoFactorAuthentication() {
+        val authorizedApiService = createAuthorizedApiService()
         authorizedApiService.turnOnTwoFactorAuthentication()
     }
 
-    suspend fun turnOffTwoFactorAuthentication(token: String) {
-        val authorizedApiService = createAuthorizedApiService(token)
+    suspend fun turnOffTwoFactorAuthentication() {
+        val authorizedApiService = createAuthorizedApiService()
         authorizedApiService.turnOffTwoFactorAuthentication()
     }
 
-    suspend fun authenticateTwoFactor(token: String, body: TfCodeAuthDto): TokenResponse {
-        val authorizedApiService = createAuthorizedApiService(token)
+    suspend fun authenticateTwoFactor(body: TfCodeAuthDto): TokenResponse {
+        val authorizedApiService = createAuthorizedApiService()
         return authorizedApiService.authenticateTwoFactor(body)
     }
 
-    suspend fun generateTwoFactor(token: String): Pair<String, String> {
-        val authorizedApiService = createAuthorizedApiService(token)
+    suspend fun generateTwoFactor(): Pair<String, String> {
+        val authorizedApiService = createAuthorizedApiService()
         val response = authorizedApiService.generateTwoFactor()
         val qrCodeUrl = response["qrCodeUrl"] ?: throw IOException("Failed to generate QR code")
         val otpAuthUrl = response["setupKey"] ?: throw IOException("Failed to retrieve OTP URL")
         return Pair(qrCodeUrl, otpAuthUrl)
     }
 
-    suspend fun logout(token: String) {
-        val authorizedApiService = createAuthorizedApiService(token)
+    suspend fun logout() {
+        val authorizedApiService = createAuthorizedApiService()
         authorizedApiService.logout()
     }
 
