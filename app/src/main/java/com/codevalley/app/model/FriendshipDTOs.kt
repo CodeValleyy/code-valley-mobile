@@ -16,4 +16,3 @@ data class FriendshipResponseDTO(
     val status: String, // "pending" | "accepted" | "declined"
     val createdAt: Date
 )
-
