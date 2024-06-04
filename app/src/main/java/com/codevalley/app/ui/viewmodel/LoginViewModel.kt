@@ -2,11 +2,12 @@ package com.codevalley.app.ui.viewmodel
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.NavController
 import com.codevalley.app.repository.UserRepository
+import com.codevalley.app.ui.navigation.ScreenName
 import com.codevalley.app.utils.TokenManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -21,27 +22,26 @@ class LoginViewModel @Inject constructor(
     var password by mutableStateOf("")
     var errorMessage by mutableStateOf("")
 
-    fun login(): Boolean {
+    fun login(navController: NavController) {
         if (email == "") {
             errorMessage = "Please enter an email"
-            return false
         }
-        if (password == "") {
+        else if (password == "") {
             errorMessage = "Please enter your password"
-            return false
         }
         else {
-            var success = false
             viewModelScope.launch {
                 try {
                     TokenManager.token = userRepository.login(email, password).accessToken
-                    success = true
+                    email = ""
+                    password = ""
+                    errorMessage = ""
+                    navController.navigate(ScreenName.Profile.toString())
                 } catch (e: Exception) {
                     errorMessage = "Email or password incorrect"
                     TokenManager.token = null
                 }
             }
-            return success
         }
     }
 }

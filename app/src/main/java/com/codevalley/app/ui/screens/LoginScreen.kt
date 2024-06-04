@@ -106,11 +106,7 @@ fun LoginScreen(navController: NavController, loginViewModel: LoginViewModel = h
             )
             Spacer(modifier = Modifier.height(20.dp))
             Button(
-                onClick = {
-                    if (loginViewModel.login()) {
-                        navController.navigate(ScreenName.Profile.toString())
-                    }
-                },
+                onClick = { loginViewModel.login(navController) },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(8.dp),
                 contentPadding = PaddingValues(20.dp),

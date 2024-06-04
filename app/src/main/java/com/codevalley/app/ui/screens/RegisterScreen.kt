@@ -128,11 +128,7 @@ fun RegisterScreen(navController: NavController, registerViewModel: RegisterView
             )
             Spacer(modifier = Modifier.height(20.dp))
             Button(
-                onClick = {
-                    if (registerViewModel.register()) {
-                        navController.navigate(ScreenName.Profile.toString())
-                    }
-                },
+                onClick = { registerViewModel.register(navController) },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(8.dp),
                 contentPadding = PaddingValues(20.dp),
