@@ -1,4 +1,4 @@
-package com.codevalley.app.ui.screens
+package com.codevalley.app.ui.viewmodel
 
 import android.net.Uri
 import androidx.compose.runtime.getValue

@@ -56,7 +56,7 @@ fun MainScreen(navController: NavHostController? = null) {
             )
             Spacer(modifier = Modifier.height(32.dp))
             Button(onClick = {
-                navController!!.navigate("profile")
+                navController!!.navigate("post")
             }) {
                 Text(text = "Get started")
             }

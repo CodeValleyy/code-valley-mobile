@@ -29,6 +29,8 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
 import com.codevalley.app.R
+import com.codevalley.app.ui.components.LoadingIndicator
+import com.codevalley.app.ui.viewmodel.ProfileViewModel
 import com.codevalley.app.utils.Constants
 
 @Composable
@@ -56,12 +58,7 @@ fun ProfileScreen(userId: Int, token: String, navController: NavController, prof
     }
 
     if (profileState == null && errorMessage == null) {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            CircularProgressIndicator()
-        }
+        LoadingIndicator()
     } else if (errorMessage != null) {
         AlertDialog(
             onDismissRequest = { /* Do nothing */ },
