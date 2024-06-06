@@ -6,6 +6,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
+import com.codevalley.app.model.ApiAuthResponse
 import com.codevalley.app.repository.UserRepository
 import com.codevalley.app.ui.navigation.ScreenName
 import com.codevalley.app.utils.TokenManager
@@ -31,19 +32,24 @@ class LoginViewModel @Inject constructor(
             errorMessage = "Please enter your password"
         }
         else {
+            errorMessage = ""
             isWaiting = true
             viewModelScope.launch {
-                try {
-                    TokenManager.token = userRepository.login(email, password).accessToken
-                    email = ""
-                    password = ""
-                    errorMessage = ""
-                    isWaiting = false
-                    navController.navigate(ScreenName.Profile.toString())
-                } catch (e: Exception) {
-                    isWaiting = false
-                    errorMessage = "Email or password incorrect"
-                    TokenManager.token = null
+                when (val apiResponse = userRepository.login(email, password)) {
+                    is ApiAuthResponse.Success -> {
+                        TokenManager.token = apiResponse.data.accessToken
+                        email = ""
+                        password = ""
+                        errorMessage = ""
+                        isWaiting = false
+                        navController.navigate(ScreenName.Profile.toString())
+                    }
+                    is ApiAuthResponse.Error -> {
+                        val error = apiResponse.error
+                        isWaiting = false
+                        errorMessage = error.getMessage()
+                        TokenManager.token = null
+                    }
                 }
             }
         }

@@ -7,17 +7,23 @@ import retrofit2.Retrofit
 import javax.inject.Inject
 import android.content.Context
 import android.net.Uri
+import com.codevalley.app.model.ApiAuthResponse
+import com.codevalley.app.model.ApiError
 import com.codevalley.app.model.LoginRequestDTO
 import com.codevalley.app.model.RegisterRequestDTO
 import com.codevalley.app.model.TfCodeAuthDto
 import com.codevalley.app.model.TokenResponse
 import com.codevalley.app.network.AuthService
 import com.codevalley.app.network.createAuthorizedApiService
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.OkHttpClient
 import okhttp3.RequestBody.Companion.toRequestBody
+import retrofit2.HttpException
 import java.io.IOException
 import java.util.Date
+import java.lang.reflect.Type
 
 class UserRepository @Inject constructor(
     private val retrofit: Retrofit,
@@ -60,7 +66,7 @@ class UserRepository @Inject constructor(
         return try {
             val response = authorizedApiService.uploadAvatar(userIdRequestBody, filePart)
             response.avatarUrl
-        } catch (e: retrofit2.HttpException) {
+        } catch (e: HttpException) {
             val errorBody = e.response()?.errorBody()?.string()
             throw IOException("HTTP ${e.code()} ${e.message()}: $errorBody")
         }
@@ -94,11 +100,37 @@ class UserRepository @Inject constructor(
         authorizedApiService.logout()
     }
 
-    suspend fun login(email: String, password: String): TokenResponse {
-        return authService.login(LoginRequestDTO(email, password))
+    suspend fun login(email: String, password: String): ApiAuthResponse<TokenResponse> {
+        return try {
+            val response = authService.login(LoginRequestDTO(email, password))
+            ApiAuthResponse.Success(response)
+        } catch (e: HttpException) {
+            val errorBody = e.response()?.errorBody()?.string()
+            val gson = Gson()
+            val type = object : TypeToken<ApiError>() {}.type
+            val errorResponse: ApiError? = gson.fromJson(errorBody, type)
+            errorResponse?.let {
+                ApiAuthResponse.Error(it)
+            } ?: ApiAuthResponse.Error(ApiError("An unexpected error occured when trying to login to your account", "Error", e.code()))
+        } catch (e: Exception) {
+            ApiAuthResponse.Error(ApiError(e.localizedMessage ?: "An unexpected error occured when trying to login to your account", "Error", -1))
+        }
     }
 
-    suspend fun register(username: String, email: String, password: String): TokenResponse {
-        return authService.register(RegisterRequestDTO(username, email, password))
+    suspend fun register(username: String, email: String, password: String): ApiAuthResponse<TokenResponse> {
+        return try {
+            val response = authService.register(RegisterRequestDTO(username, email, password))
+            ApiAuthResponse.Success(response)
+        } catch (e: HttpException) {
+            val errorBody = e.response()?.errorBody()?.string()
+            val gson = Gson()
+            val type = object : TypeToken<ApiError>() {}.type
+            val errorResponse: ApiError? = gson.fromJson(errorBody, type)
+            errorResponse?.let {
+                ApiAuthResponse.Error(it)
+            } ?: ApiAuthResponse.Error(ApiError("An unexpected error occured during the creation of your account", "Error", e.code()))
+        } catch (e: Exception) {
+            ApiAuthResponse.Error(ApiError(e.localizedMessage ?: "An unexpected error occured during the creation of your account", "Error", -1))
+        }
     }
 }
