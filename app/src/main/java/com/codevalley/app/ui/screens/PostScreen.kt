@@ -9,6 +9,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.outlined.Email
@@ -21,7 +22,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
@@ -37,7 +37,6 @@ fun PostScreen(navController: NavController, token: String, postViewModel: PostV
     val posts by postViewModel.posts.collectAsState()
     val errorMessage by postViewModel.errorMessage.collectAsState()
     val isLoading by postViewModel.isLoading.collectAsState()
-
     val context = LocalContext.current
 
     LaunchedEffect(Unit) {
@@ -49,7 +48,16 @@ fun PostScreen(navController: NavController, token: String, postViewModel: PostV
             TopAppBar(
                 title = { Text("Posts") },
                 backgroundColor = MaterialTheme.colors.primary,
-                contentColor = Color.White
+                contentColor = Color.White,
+                navigationIcon = {
+                    IconButton(onClick = {
+                       if (!navController.popBackStack()) {
+                            navController.navigate("main")
+                       }
+                    }) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                    }
+                }
             )
         },
         content = { padding ->
