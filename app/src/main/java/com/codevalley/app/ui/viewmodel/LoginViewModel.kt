@@ -21,6 +21,7 @@ class LoginViewModel @Inject constructor(
     var email by mutableStateOf("")
     var password by mutableStateOf("")
     var errorMessage by mutableStateOf("")
+    var isWaiting by mutableStateOf(false)
 
     fun login(navController: NavController) {
         if (email == "") {
@@ -30,14 +31,17 @@ class LoginViewModel @Inject constructor(
             errorMessage = "Please enter your password"
         }
         else {
+            isWaiting = true
             viewModelScope.launch {
                 try {
                     TokenManager.token = userRepository.login(email, password).accessToken
                     email = ""
                     password = ""
                     errorMessage = ""
+                    isWaiting = false
                     navController.navigate(ScreenName.Profile.toString())
                 } catch (e: Exception) {
+                    isWaiting = false
                     errorMessage = "Email or password incorrect"
                     TokenManager.token = null
                 }

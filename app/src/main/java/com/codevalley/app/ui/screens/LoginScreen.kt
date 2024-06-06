@@ -16,6 +16,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Button
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.MaterialTheme.colors
@@ -101,11 +102,19 @@ fun LoginScreen(navController: NavController, loginViewModel: LoginViewModel = h
                 visualTransformation = PasswordVisualTransformation(),
                 modifier = Modifier.fillMaxWidth()
             )
-            Spacer(modifier = Modifier.height(20.dp))
-            Text(
-                text = loginViewModel.errorMessage,
-                color = Color.Red
-            )
+            Spacer(modifier = Modifier.height(15.dp))
+            if (loginViewModel.isWaiting) {
+                CircularProgressIndicator(
+                    color = colors.primary,
+                    strokeWidth = 4.dp
+                )
+            }
+            else {
+                Text(
+                    text = loginViewModel.errorMessage,
+                    color = Color.Red
+                )
+            }
             Spacer(modifier = Modifier.height(20.dp))
             Button(
                 onClick = { loginViewModel.login(navController) },

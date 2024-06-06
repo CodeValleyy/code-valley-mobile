@@ -23,6 +23,7 @@ class RegisterViewModel @Inject constructor(
     var password by mutableStateOf("")
     var samePassword by mutableStateOf("")
     var errorMessage by mutableStateOf("")
+    var isWaiting by mutableStateOf(false)
 
     fun register(navController: NavController) {
         if (username == "") {
@@ -41,17 +42,22 @@ class RegisterViewModel @Inject constructor(
             errorMessage = "Passwords does not match"
         }
         else {
+            errorMessage = ""
+            isWaiting = true
             viewModelScope.launch {
                 try {
-                    TokenManager.token = userRepository.register(username, email, password).accessToken
+                    userRepository.register(username, email, password)
+                    //TokenManager.token = userRepository.login(email, password).accessToken
                     username = ""
                     email = ""
                     password = ""
                     samePassword = ""
                     errorMessage = ""
+                    isWaiting = false
                     navController.navigate(ScreenName.Profile.toString())
                 } catch (e: Exception) {
                     e.printStackTrace()
+                    isWaiting = false
                     errorMessage = "An error occured during the creation of your account"
                     TokenManager.token = null
                 }
