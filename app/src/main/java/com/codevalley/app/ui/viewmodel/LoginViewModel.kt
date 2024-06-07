@@ -10,7 +10,7 @@ import com.codevalley.app.model.ApiAuthResponse
 import com.codevalley.app.repository.UserRepository
 import com.codevalley.app.ui.navigation.ScreenName
 import com.codevalley.app.utils.TokenManager
-import com.codevalley.app.utils.UserStore
+import com.codevalley.app.store.UserStore
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject

@@ -34,15 +34,19 @@ fun PostItem(
     onLike: () -> Unit,
     onUnlike: () -> Unit,
     navController: NavController,
-    viewModel: NewsFeedViewModel
+    viewModel: NewsFeedViewModel,
+    isDetailScreen: Boolean = false
 ) {
     val dateFormat = remember { SimpleDateFormat("dd MMMM yyyy", Locale.getDefault()) }
     val userProfile = viewModel.userProfile
+
+    var localPost by remember { mutableStateOf(post) }
 
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
+            .clickable(enabled = !isDetailScreen) { navController.navigate("${ScreenName.PostDetail}/${post.id}") }
     ) {
         Column(
             modifier = Modifier
@@ -51,7 +55,7 @@ fun PostItem(
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Image(
-                    painter = rememberAsyncImagePainter(post.avatar),
+                    painter = rememberAsyncImagePainter(post.avatar ?: ""),
                     contentDescription = null,
                     modifier = Modifier
                         .size(48.dp)
@@ -62,36 +66,45 @@ fun PostItem(
                 Column(
                     modifier = Modifier.clickable { navController.navigate("${ScreenName.Profile}/${post.userId}") }
                 ) {
-                    Text(post.username, fontWeight = FontWeight.Bold)
-                    Text(dateFormat.format(post.createdAt), style = MaterialTheme.typography.body2)
+                    Text(localPost.username, fontWeight = FontWeight.Bold)
+                    Text(dateFormat.format(localPost.createdAt), style = MaterialTheme.typography.body2)
                 }
                 Spacer(modifier = Modifier.weight(1f))
-                if (userProfile?.id == post.userId) {
+                if (userProfile?.id == localPost.userId) {
                     IconButton(onClick = {
-                        viewModel.deletePost(post.id)
+                        viewModel.deletePost(localPost.id)
+                        navController.popBackStack()
                     }) {
                         Icon(Icons.Default.Delete, contentDescription = "Delete Post")
                     }
                 }
             }
             Spacer(modifier = Modifier.height(10.dp))
-            Text(post.content, style = MaterialTheme.typography.body1)
+            Text(localPost.content, style = MaterialTheme.typography.body1)
             Spacer(modifier = Modifier.height(8.dp))
             Image(
-                painter = rememberAsyncImagePainter("data:image/png;base64,${post.avatar}"),
+                painter = rememberAsyncImagePainter("data:image/png;base64,${localPost.avatar ?: ""}"),
                 contentDescription = "Post Image",
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxWidth()
             )
             Spacer(modifier = Modifier.height(5.dp))
             Row(verticalAlignment = Alignment.CenterVertically) {
-                IconButton(onClick = if (post.userHasLiked) onUnlike else onLike) {
+                IconButton(onClick = {
+                    if (localPost.userHasLiked) {
+                        onUnlike()
+                        localPost = localPost.copy(userHasLiked = false, likes = localPost.likes - 1)
+                    } else {
+                        onLike()
+                        localPost = localPost.copy(userHasLiked = true, likes = localPost.likes + 1)
+                    }
+                }) {
                     Icon(
-                        imageVector = if (post.userHasLiked) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
+                        imageVector = if (localPost.userHasLiked) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
                         contentDescription = null
                     )
                 }
-                Text("${post.likes}")
+                Text("${localPost.likes}")
                 Spacer(modifier = Modifier.width(16.dp))
                 IconButton(onClick = { /* Comment on post */ }) {
                     Icon(

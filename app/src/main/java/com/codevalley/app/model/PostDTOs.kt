@@ -25,3 +25,13 @@ data class PostResponseDto(
     val likes: Int,
     val userHasLiked: Boolean
 )
+
+data class Comment(
+    val id: Int,
+    val avatar: String,
+    val username: String,
+    val userId: Int,
+    val content: String,
+    val createdAt: Date,
+    val hasLiked: Boolean
+)

@@ -8,7 +8,8 @@ import com.codevalley.app.model.PostResponseDto
 import com.codevalley.app.model.UserResponseDTO
 import com.codevalley.app.repository.FriendshipRepository
 import com.codevalley.app.repository.PostRepository
-import com.codevalley.app.utils.UserStore
+import com.codevalley.app.store.PostStore
+import com.codevalley.app.store.UserStore
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -25,11 +26,10 @@ class NewsFeedViewModel @Inject constructor(
     private val _isLoading = MutableStateFlow(true)
     val isLoading: StateFlow<Boolean> = _isLoading
 
-    private val _posts = MutableStateFlow<List<PostResponseDto>>(emptyList())
-    val posts: StateFlow<List<PostResponseDto>> = _posts
-
     private val _errorMessage = MutableStateFlow("")
     val errorMessage: StateFlow<String> = _errorMessage
+
+    val posts: StateFlow<List<PostResponseDto>> = PostStore.posts
 
     val userProfile: UserResponseDTO?
         get() = UserStore.userProfile
@@ -38,8 +38,9 @@ class NewsFeedViewModel @Inject constructor(
         viewModelScope.launch {
             _isLoading.value = true
             try {
-                val posts = postRepository.getPosts()
-                _posts.value = posts
+                var posts = postRepository.getPosts()
+                posts = posts.sortedByDescending { it.createdAt }
+                PostStore.setPosts(posts)
                 _isLoading.value = false
             } catch (e: Exception) {
                 _errorMessage.value = "Failed to load posts."
@@ -123,5 +124,9 @@ class NewsFeedViewModel @Inject constructor(
             }
         }
 
+    }
+
+    private fun updatePostLocal(postId: Int, update: (PostResponseDto) -> PostResponseDto) {
+        PostStore.updatePost(postId, update)
     }
 }

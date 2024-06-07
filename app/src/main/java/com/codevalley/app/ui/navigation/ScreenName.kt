@@ -6,9 +6,11 @@ enum class ScreenName(private val value: String) {
     Register("Register"),
     NewsFeed("newsfeed"),
     Profile("profile"),
-    Settings("settings");
+    Settings("settings"),
+    PostDetail("postDetail");
 
     override fun toString(): String {
         return value
     }
+
 }

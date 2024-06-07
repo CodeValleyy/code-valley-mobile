@@ -1,4 +1,4 @@
-package com.codevalley.app.utils
+package com.codevalley.app.store
 
 import com.codevalley.app.model.UserResponseDTO
 
