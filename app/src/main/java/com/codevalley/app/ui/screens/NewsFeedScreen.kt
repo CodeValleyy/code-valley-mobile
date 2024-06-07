@@ -41,6 +41,7 @@ fun PostScreen(navController: NavController, newsFeedViewModel: NewsFeedViewMode
     val isLoading by newsFeedViewModel.isLoading.collectAsState()
     val context = LocalContext.current
     val userProfile = newsFeedViewModel.userProfile
+    var searchQuery by remember { mutableStateOf("") }
 
     LaunchedEffect(Unit) {
         newsFeedViewModel.loadPosts()
@@ -49,18 +50,36 @@ fun PostScreen(navController: NavController, newsFeedViewModel: NewsFeedViewMode
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Posts") },
-                backgroundColor = MaterialTheme.colors.primary,
-                contentColor = Color.White,
-                navigationIcon = {
-                    IconButton(onClick = {
-                        if (!navController.popBackStack()) {
-                            navController.navigate("main")
-                        }
-                    }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                title = {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(36.dp)
+                            .background(MaterialTheme.colors.surface, CircleShape)
+                            .padding(horizontal = 8.dp, vertical = 4.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        TextField(
+                            value = searchQuery,
+                            onValueChange = { searchQuery = it },
+                            placeholder = { Text("Search") },
+                            singleLine = true,
+                            colors = TextFieldDefaults.textFieldColors(
+                                textColor = MaterialTheme.colors.onSurface,
+                                backgroundColor = Color.Transparent,
+                                cursorColor = LocalContentColor.current.copy(alpha = LocalContentAlpha.current),
+                                focusedIndicatorColor = Color.Transparent,
+                                unfocusedIndicatorColor = Color.Transparent,
+                                disabledIndicatorColor = Color.Transparent
+                            ),
+                            modifier = Modifier.fillMaxWidth(),
+                            textStyle = LocalTextStyle.current.copy(fontSize = MaterialTheme.typography.body2.fontSize)
+                        )
                     }
                 },
+                backgroundColor = MaterialTheme.colors.primary,
+                contentColor = Color.White,
+                modifier = Modifier.height(56.dp),
                 actions = {
                     if (userProfile != null) {
                         IconButton(onClick = {

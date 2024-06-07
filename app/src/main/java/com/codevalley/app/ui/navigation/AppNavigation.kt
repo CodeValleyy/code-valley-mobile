@@ -11,11 +11,9 @@ import com.codevalley.app.ui.screens.PostScreen
 import com.codevalley.app.ui.screens.ProfileScreen
 import com.codevalley.app.ui.screens.RegisterScreen
 import com.codevalley.app.ui.screens.SettingsScreen
-import com.codevalley.app.utils.Constants
 
 @Composable
-fun AppNavigation() {
-    val navController: NavHostController = rememberNavController()
+fun AppNavigation(navController: NavHostController = rememberNavController()) {
     NavHost(navController = navController, startDestination = ScreenName.Main.toString()) {
         composable(ScreenName.Main.toString()) {
             MainScreen(navController)
@@ -37,10 +35,7 @@ fun AppNavigation() {
             SettingsScreen(navController)
         }
         composable(ScreenName.NewsFeed.toString()) {
-            PostScreen(
-                navController = navController,
-            )
+            PostScreen(navController)
         }
-
     }
 }
