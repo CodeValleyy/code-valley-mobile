@@ -15,4 +15,15 @@ object PostStore {
     fun getPostById(postId: Int): PostResponseDto? {
         return _posts.value.firstOrNull { it.id == postId }
     }
+
+    fun updatePost(postId: Int, update: (PostResponseDto) -> PostResponseDto) {
+        _posts.value = _posts.value.map {
+            if (it.id == postId) {
+                update(it)
+            } else {
+                it
+            }
+        }
+
+    }
 }

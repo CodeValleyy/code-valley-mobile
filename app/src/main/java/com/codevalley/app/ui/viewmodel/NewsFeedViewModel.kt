@@ -38,7 +38,8 @@ class NewsFeedViewModel @Inject constructor(
         viewModelScope.launch {
             _isLoading.value = true
             try {
-                val posts = postRepository.getPosts()
+                var posts = postRepository.getPosts()
+                posts = posts.sortedByDescending { it.createdAt }
                 PostStore.setPosts(posts)
                 _isLoading.value = false
             } catch (e: Exception) {
@@ -123,5 +124,9 @@ class NewsFeedViewModel @Inject constructor(
             }
         }
 
+    }
+
+    private fun updatePostLocal(postId: Int, update: (PostResponseDto) -> PostResponseDto) {
+        PostStore.updatePost(postId, update)
     }
 }

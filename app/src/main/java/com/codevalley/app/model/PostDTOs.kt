@@ -30,7 +30,9 @@ data class Comment(
     val id: Int,
     val avatar: String,
     val username: String,
+    val userId: Int,
     val content: String,
     val createdAt: Date,
     val hasLiked: Boolean
 )
+
