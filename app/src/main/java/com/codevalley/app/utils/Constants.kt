@@ -2,5 +2,4 @@ package com.codevalley.app.utils
 
 object Constants {
     const val BASE_URL = "https://user-management.code-valley.xyz"
-    const val BEARER_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJyaWNhcmRvLmp1ZXpAZ21haWwuY29tIiwidXNlcm5hbWUiOiJjYXJsaXRvMDYwNSIsImxhc3RMb2dpbkF0IjoiMjAyNC0wNi0wNVQyMjo1NDozMC44MThaIiwiY3JlYXRlZEF0IjoiMjAyNC0wNS0yOVQyMDo0NDozOC45ODRaIiwiaXNUd29GYWN0b3JBdXRoZW50aWNhdGVkIjpmYWxzZSwiaWF0IjoxNzE3NjYxODQxLCJleHAiOjE3MTc3NDgyNDF9.E9JZoZi81fBnSPgo7nthVg1dTWz_D7df_tk56gKGMg4"
 }

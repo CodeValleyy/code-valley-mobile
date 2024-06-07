@@ -12,31 +12,31 @@ class GroupRepository @Inject constructor(
     private val retrofit: Retrofit
 ) {
 
-    private fun createAuthorizedApiService(token: String): GroupService {
-        return createAuthorizedApiService(token, retrofit, GroupService::class.java)
+    private fun createAuthorizedApiService(): GroupService {
+        return createAuthorizedApiService(retrofit, GroupService::class.java)
     }
-        suspend fun createGroup(groupDTO: GroupDTO, token: String): GroupResponseDTO {
-        val groupService = createAuthorizedApiService(token)
+        suspend fun createGroup(groupDTO: GroupDTO): GroupResponseDTO {
+        val groupService = createAuthorizedApiService()
         return groupService.createGroup(groupDTO)
     }
 
-    suspend fun addUserToGroup(groupId: Int, userId: Int, token: String): GroupResponseDTO {
-        val groupService = createAuthorizedApiService(token)
+    suspend fun addUserToGroup(groupId: Int, userId: Int): GroupResponseDTO {
+        val groupService = createAuthorizedApiService()
         return groupService.addUserToGroup(groupId, userId)
     }
 
-    suspend fun removeUserFromGroup(groupId: Int, userId: Int, token: String) {
-        val groupService = createAuthorizedApiService(token)
+    suspend fun removeUserFromGroup(groupId: Int, userId: Int) {
+        val groupService = createAuthorizedApiService()
         groupService.removeUserFromGroup(groupId, userId)
     }
 
-    suspend fun listGroups(token: String): List<GroupResponseDTO> {
-        val groupService = createAuthorizedApiService(token)
+    suspend fun listGroups(): List<GroupResponseDTO> {
+        val groupService = createAuthorizedApiService()
         return groupService.listGroups()
     }
 
-    suspend fun getGroupDetails(groupId: Int, token: String): GroupResponseDTO {
-        val groupService = createAuthorizedApiService(token)
+    suspend fun getGroupDetails(groupId: Int): GroupResponseDTO {
+        val groupService = createAuthorizedApiService()
         return groupService.getGroupDetails(groupId)
     }
 }
