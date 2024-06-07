@@ -14,32 +14,27 @@ class PostRepository @Inject constructor(
     private val context: Context
 ) {
 
-    private fun createAuthorizedApiService(): PostService {
-        return createAuthorizedApiService(retrofit, PostService::class.java)
+    private val postService: PostService by lazy {
+        createAuthorizedApiService(retrofit, PostService::class.java)
     }
 
     suspend fun getPosts(): List<PostResponseDto> {
-        val authorizedApiService = createAuthorizedApiService()
-        return authorizedApiService.getPosts()
+        return postService.getPosts()
     }
 
     suspend fun createPost(createPostDto: CreatePostDto): PostResponseDto {
-        val authorizedApiService = createAuthorizedApiService()
-        return authorizedApiService.createPost(createPostDto)
+        return postService.createPost(createPostDto)
     }
 
     suspend fun deletePost(id: Int) {
-        val authorizedApiService = createAuthorizedApiService()
-        authorizedApiService.deletePost(id)
+        postService.deletePost(id)
     }
 
     suspend fun likePost(id: Int): LikePostResponseDto {
-        val authorizedApiService = createAuthorizedApiService()
-        return authorizedApiService.likePost(id)
+        return postService.likePost(id)
     }
 
     suspend fun unlikePost(id: Int): LikePostResponseDto {
-        val authorizedApiService = createAuthorizedApiService()
-        return authorizedApiService.unlikePost(id)
+        return postService.unlikePost(id)
     }
 }

@@ -7,14 +7,13 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.codevalley.app.ui.screens.LoginScreen
 import com.codevalley.app.ui.screens.MainScreen
+import com.codevalley.app.ui.screens.NewsFeedScreen
 import com.codevalley.app.ui.screens.ProfileScreen
 import com.codevalley.app.ui.screens.RegisterScreen
 import com.codevalley.app.ui.screens.SettingsScreen
-import com.codevalley.app.utils.Constants
 
 @Composable
-fun AppNavigation() {
-    val navController: NavHostController = rememberNavController()
+fun AppNavigation(navController: NavHostController = rememberNavController()) {
     NavHost(navController = navController, startDestination = ScreenName.Main.toString()) {
         composable(ScreenName.Main.toString()) {
             MainScreen(navController)
@@ -25,7 +24,7 @@ fun AppNavigation() {
         composable(ScreenName.Register.toString()) {
             RegisterScreen(navController)
         }
-        composable(ScreenName.Profile.toString()) { backStackEntry ->
+        composable("${ScreenName.Profile}/{userId}") { backStackEntry ->
             val userId = backStackEntry.arguments?.getString("userId")?.toInt() ?: 1
             ProfileScreen(
                 userId = userId,
@@ -34,6 +33,9 @@ fun AppNavigation() {
         }
         composable(ScreenName.Settings.toString()) {
             SettingsScreen(navController)
+        }
+        composable(ScreenName.NewsFeed.toString()) {
+            NewsFeedScreen(navController)
         }
     }
 }

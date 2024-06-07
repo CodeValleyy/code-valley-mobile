@@ -29,6 +29,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
 import com.codevalley.app.R
+import com.codevalley.app.ui.components.LoadingIndicator
 import com.codevalley.app.ui.navigation.ScreenName
 import com.codevalley.app.ui.viewmodel.ProfileViewModel
 
@@ -57,12 +58,7 @@ fun ProfileScreen(userId: Int, navController: NavController, profileViewModel: P
     }
 
     if (profileState == null && errorMessage == null) {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            CircularProgressIndicator()
-        }
+        LoadingIndicator()
     } else if (errorMessage != null) {
         AlertDialog(
             onDismissRequest = { /* Do nothing */ },
@@ -121,12 +117,10 @@ fun ProfileScreen(userId: Int, navController: NavController, profileViewModel: P
                             .fillMaxSize()
                             .padding(16.dp)
                     ) {
-                        val painter = if (imageUri != null) {
-                            rememberAsyncImagePainter(imageUri)
-                        } else if (profile.avatar.isNotEmpty()) {
-                            rememberAsyncImagePainter(profile.avatar)
-                        } else {
-                            painterResource(id = R.drawable.image)
+                        val painter = when {
+                            imageUri != null -> rememberAsyncImagePainter(imageUri)
+                            profile.avatar?.isNotEmpty() == true -> rememberAsyncImagePainter(profile.avatar)
+                            else -> painterResource(id = R.drawable.image)
                         }
 
                         Image(
