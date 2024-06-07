@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.codevalley.app.R
+import com.codevalley.app.ui.navigation.ScreenName
 import com.codevalley.app.ui.theme.CodeValleyTheme
 
 @Composable
@@ -56,7 +57,7 @@ fun MainScreen(navController: NavHostController? = null) {
             )
             Spacer(modifier = Modifier.height(32.dp))
             Button(onClick = {
-                navController!!.navigate("profile")
+                navController!!.navigate(ScreenName.Login.toString())
             }) {
                 Text(text = "Get started")
             }
@@ -66,7 +67,7 @@ fun MainScreen(navController: NavHostController? = null) {
 
 @Preview(showBackground = true)
 @Composable
-fun DefaultPreview() {
+fun MainScreenPreview() {
     CodeValleyTheme {
         MainScreen(navController = rememberNavController())
     }

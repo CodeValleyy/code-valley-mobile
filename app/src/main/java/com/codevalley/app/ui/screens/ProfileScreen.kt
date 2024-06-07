@@ -29,10 +29,11 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
 import com.codevalley.app.R
-import com.codevalley.app.utils.Constants
+import com.codevalley.app.ui.navigation.ScreenName
+import com.codevalley.app.ui.viewmodel.ProfileViewModel
 
 @Composable
-fun ProfileScreen(userId: Int, token: String, navController: NavController, profileViewModel: ProfileViewModel = hiltViewModel()) {
+fun ProfileScreen(userId: Int, navController: NavController, profileViewModel: ProfileViewModel = hiltViewModel()) {
     val profileState by profileViewModel::profile
     val currentUser by profileViewModel::currentUser
     val errorMessage by profileViewModel::errorMessage
@@ -43,12 +44,12 @@ fun ProfileScreen(userId: Int, token: String, navController: NavController, prof
     ) { uri: Uri? ->
         uri?.let {
             imageUri = it
-            profileViewModel.uploadAvatar(userId, it, token)
+            profileViewModel.uploadAvatar(userId, it)
         }
     }
 
     LaunchedEffect(Unit) {
-        profileViewModel.loadProfile(userId, token)
+        profileViewModel.loadProfile(userId)
     }
 
     BackHandler {
@@ -71,8 +72,8 @@ fun ProfileScreen(userId: Int, token: String, navController: NavController, prof
                 Button(
                     onClick = {
                         profileViewModel.errorMessage = null
-                        navController.navigate("main") {
-                            popUpTo("profile") { inclusive = true }
+                        navController.navigate(ScreenName.Main.toString()) {
+                            popUpTo(ScreenName.Profile.toString()) { inclusive = true }
                         }
                     }
                 ) {
@@ -80,7 +81,8 @@ fun ProfileScreen(userId: Int, token: String, navController: NavController, prof
                 }
             }
         )
-    } else {
+    }
+    else {
         profileState?.let { profile ->
             Surface(
                 modifier = Modifier.fillMaxSize(),
@@ -92,7 +94,7 @@ fun ProfileScreen(userId: Int, token: String, navController: NavController, prof
                     IconButton(
                         onClick = {
                             if (!navController.popBackStack()) {
-                                navController.navigate("main")
+                                navController.navigate(ScreenName.Main.toString())
                             }
                         },
                         modifier = Modifier
@@ -104,7 +106,7 @@ fun ProfileScreen(userId: Int, token: String, navController: NavController, prof
 
                     if (currentUser?.id == userId) {
                         IconButton(
-                            onClick = { navController.navigate("settings") },
+                            onClick = { navController.navigate(ScreenName.Settings.toString()) },
                             modifier = Modifier
                                 .align(Alignment.TopEnd)
                                 .padding(16.dp)
@@ -121,7 +123,7 @@ fun ProfileScreen(userId: Int, token: String, navController: NavController, prof
                     ) {
                         val painter = if (imageUri != null) {
                             rememberAsyncImagePainter(imageUri)
-                        } else if (!profile.avatar.isNullOrEmpty()) {
+                        } else if (profile.avatar.isNotEmpty()) {
                             rememberAsyncImagePainter(profile.avatar)
                         } else {
                             painterResource(id = R.drawable.image)
@@ -206,7 +208,6 @@ fun ProfileScreenPreview() {
     val navController = rememberNavController()
     ProfileScreen(
         userId = 1,
-        token = Constants.BEARER_TOKEN,
         navController = navController
     )
 }

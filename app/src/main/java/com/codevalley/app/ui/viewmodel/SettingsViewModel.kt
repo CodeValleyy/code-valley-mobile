@@ -1,4 +1,4 @@
-package com.codevalley.app.ui.screens
+package com.codevalley.app.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -27,10 +27,10 @@ class SettingsViewModel @Inject constructor(
     private val _errorMessage = MutableStateFlow("")
     val errorMessage: StateFlow<String> = _errorMessage
 
-    fun loadTwoFactorStatus(token: String) {
+    fun loadTwoFactorStatus() {
         viewModelScope.launch {
             try {
-                val user = userRepository.getMe(token)
+                val user = userRepository.getMe()
                 _isTwoFactorEnabled.value = user.isTwoFactorAuthenticationEnabled
             } catch (e: Exception) {
                 _errorMessage.value = "Failed to load two-factor status."
@@ -38,11 +38,11 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-    fun enableTwoFactor(token: String) {
+    fun enableTwoFactor() {
         viewModelScope.launch {
             try {
-                userRepository.turnOnTwoFactorAuthentication(token)
-                val (qrCodeUrl, setupKey) = userRepository.generateTwoFactor(token)
+                userRepository.turnOnTwoFactorAuthentication()
+                val (qrCodeUrl, setupKey) = userRepository.generateTwoFactor()
                 _qrCodeUrl.value = qrCodeUrl
                 _setupKey.value = setupKey
                 println("QR code URL: $qrCodeUrl")
@@ -53,10 +53,10 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-    fun disableTwoFactor(token: String) {
+    fun disableTwoFactor() {
         viewModelScope.launch {
             try {
-                userRepository.turnOffTwoFactorAuthentication(token)
+                userRepository.turnOffTwoFactorAuthentication()
                 _isTwoFactorEnabled.value = false
             } catch (e: Exception) {
                 _errorMessage.value = "Failed to disable two-factor authentication."
@@ -64,10 +64,10 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-    fun logout(token: String, navController: NavController) {
+    fun logout(navController: NavController) {
         viewModelScope.launch {
             try {
-                userRepository.logout(token)
+                userRepository.logout()
                 navController.navigate("main") {
                     popUpTo("main") { inclusive = true }
                 }

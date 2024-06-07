@@ -5,31 +5,35 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.codevalley.app.ui.screens.LoginScreen
 import com.codevalley.app.ui.screens.MainScreen
 import com.codevalley.app.ui.screens.ProfileScreen
+import com.codevalley.app.ui.screens.RegisterScreen
 import com.codevalley.app.ui.screens.SettingsScreen
 import com.codevalley.app.utils.Constants
 
 @Composable
-fun AppNavigation(token: String) {
+fun AppNavigation() {
     val navController: NavHostController = rememberNavController()
-    NavHost(navController = navController, startDestination = "main") {
-        composable("main") {
+    NavHost(navController = navController, startDestination = ScreenName.Main.toString()) {
+        composable(ScreenName.Main.toString()) {
             MainScreen(navController)
         }
-        composable("profile") { backStackEntry ->
+        composable(ScreenName.Login.toString()) {
+            LoginScreen(navController)
+        }
+        composable(ScreenName.Register.toString()) {
+            RegisterScreen(navController)
+        }
+        composable(ScreenName.Profile.toString()) { backStackEntry ->
             val userId = backStackEntry.arguments?.getString("userId")?.toInt() ?: 1
-            val token = backStackEntry.arguments?.getString("token") ?: Constants.BEARER_TOKEN
             ProfileScreen(
                 userId = userId,
-                token = token,
                 navController = navController
             )
         }
-        composable("settings") {
-            SettingsScreen(
-                token = Constants.BEARER_TOKEN,
-                navController = navController)
+        composable(ScreenName.Settings.toString()) {
+            SettingsScreen(navController)
         }
     }
 }

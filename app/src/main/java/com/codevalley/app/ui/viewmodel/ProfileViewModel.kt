@@ -1,4 +1,4 @@
-package com.codevalley.app.ui.screens
+package com.codevalley.app.ui.viewmodel
 
 import android.net.Uri
 import androidx.compose.runtime.getValue
@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-public class ProfileViewModel @Inject constructor(
+class ProfileViewModel @Inject constructor(
     private val userRepository: UserRepository
 ) : ViewModel() {
 
@@ -21,11 +21,11 @@ public class ProfileViewModel @Inject constructor(
     var currentUser by mutableStateOf<UserResponseDTO?>(null)
     var errorMessage by mutableStateOf<String?>(null)
 
-    fun loadProfile(id: Int, token: String) {
+    fun loadProfile(id: Int) {
         viewModelScope.launch {
             try {
-                profile = userRepository.getProfile(id, token)
-                currentUser = userRepository.getMe(token)
+                profile = userRepository.getProfile(id)
+                currentUser = userRepository.getMe()
             } catch (e: Exception) {
                 e.printStackTrace()
                 errorMessage = "Erreur lors du chargement du profil. Veuillez réessayer."
@@ -33,10 +33,10 @@ public class ProfileViewModel @Inject constructor(
         }
     }
 
-    fun uploadAvatar(userId: Int, fileUri: Uri, token: String) {
+    fun uploadAvatar(userId: Int, fileUri: Uri) {
         viewModelScope.launch {
             try {
-                val avatarUrl = userRepository.uploadAvatar(userId, fileUri, token)
+                val avatarUrl = userRepository.uploadAvatar(userId, fileUri)
                 profile?.avatar = avatarUrl
             } catch (e: Exception) {
                 e.printStackTrace()
