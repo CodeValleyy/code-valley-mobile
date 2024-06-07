@@ -117,12 +117,10 @@ fun ProfileScreen(userId: Int, navController: NavController, profileViewModel: P
                             .fillMaxSize()
                             .padding(16.dp)
                     ) {
-                        val painter = if (imageUri != null) {
-                            rememberAsyncImagePainter(imageUri)
-                        } else if (profile.avatar.isNotEmpty()) {
-                            rememberAsyncImagePainter(profile.avatar)
-                        } else {
-                            painterResource(id = R.drawable.image)
+                        val painter = when {
+                            imageUri != null -> rememberAsyncImagePainter(imageUri)
+                            profile.avatar?.isNotEmpty() == true -> rememberAsyncImagePainter(profile.avatar)
+                            else -> painterResource(id = R.drawable.image)
                         }
 
                         Image(

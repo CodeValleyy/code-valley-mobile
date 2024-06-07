@@ -10,6 +10,7 @@ import com.codevalley.app.model.ApiAuthResponse
 import com.codevalley.app.repository.UserRepository
 import com.codevalley.app.ui.navigation.ScreenName
 import com.codevalley.app.utils.TokenManager
+import com.codevalley.app.utils.UserStore
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -36,6 +37,7 @@ class LoginViewModel @Inject constructor(
         if (token != null) {
             try {
                 val profile = userRepository.getMe()
+                UserStore.userProfile = profile
                 navController.navigate(ScreenName.NewsFeed.toString())
             } catch (e: Exception) {
                 TokenManager.clearToken()
@@ -57,6 +59,8 @@ class LoginViewModel @Inject constructor(
                 when (val apiResponse = userRepository.login(email, password)) {
                     is ApiAuthResponse.Success -> {
                         TokenManager.token = apiResponse.data.accessToken
+                        val profile = userRepository.getMe()
+                        UserStore.userProfile = profile
                         email = ""
                         password = ""
                         errorMessage = ""

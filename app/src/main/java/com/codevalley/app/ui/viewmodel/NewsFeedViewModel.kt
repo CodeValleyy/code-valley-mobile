@@ -3,7 +3,9 @@ package com.codevalley.app.ui.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.codevalley.app.model.PostResponseDto
+import com.codevalley.app.model.UserResponseDTO
 import com.codevalley.app.repository.PostRepository
+import com.codevalley.app.utils.UserStore
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -23,6 +25,9 @@ class NewsFeedViewModel @Inject constructor(
 
     private val _errorMessage = MutableStateFlow("")
     val errorMessage: StateFlow<String> = _errorMessage
+
+    val userProfile: UserResponseDTO?
+        get() = UserStore.userProfile
 
     fun loadPosts() {
         viewModelScope.launch {

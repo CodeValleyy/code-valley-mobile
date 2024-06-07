@@ -26,7 +26,7 @@ fun AppNavigation() {
         composable(ScreenName.Register.toString()) {
             RegisterScreen(navController)
         }
-        composable(ScreenName.Profile.toString()) { backStackEntry ->
+        composable("${ScreenName.Profile}/{userId}") { backStackEntry ->
             val userId = backStackEntry.arguments?.getString("userId")?.toInt() ?: 1
             ProfileScreen(
                 userId = userId,

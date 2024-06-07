@@ -3,6 +3,7 @@ package com.codevalley.app.ui.screens
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -28,6 +29,7 @@ import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.codevalley.app.model.PostResponseDto
 import com.codevalley.app.ui.components.LoadingIndicator
+import com.codevalley.app.ui.navigation.ScreenName
 import com.codevalley.app.ui.viewmodel.NewsFeedViewModel
 import java.text.SimpleDateFormat
 import java.util.*
@@ -38,6 +40,7 @@ fun PostScreen(navController: NavController, newsFeedViewModel: NewsFeedViewMode
     val errorMessage by newsFeedViewModel.errorMessage.collectAsState()
     val isLoading by newsFeedViewModel.isLoading.collectAsState()
     val context = LocalContext.current
+    val userProfile = newsFeedViewModel.userProfile
 
     LaunchedEffect(Unit) {
         newsFeedViewModel.loadPosts()
@@ -51,11 +54,26 @@ fun PostScreen(navController: NavController, newsFeedViewModel: NewsFeedViewMode
                 contentColor = Color.White,
                 navigationIcon = {
                     IconButton(onClick = {
-                       if (!navController.popBackStack()) {
+                        if (!navController.popBackStack()) {
                             navController.navigate("main")
-                       }
+                        }
                     }) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                    }
+                },
+                actions = {
+                    if (userProfile != null) {
+                        IconButton(onClick = {
+                            navController.navigate("${ScreenName.Profile}/${userProfile.id}")
+                        }) {
+                            Image(
+                                painter = rememberAsyncImagePainter(userProfile.avatar),
+                                contentDescription = "User Avatar",
+                                modifier = Modifier
+                                    .size(40.dp)
+                                    .clip(CircleShape)
+                            )
+                        }
                     }
                 }
             )
@@ -76,7 +94,8 @@ fun PostScreen(navController: NavController, newsFeedViewModel: NewsFeedViewMode
                             PostItem(
                                 post = post,
                                 onLike = { newsFeedViewModel.likePost(post.id) },
-                                onUnlike = { newsFeedViewModel.unlikePost(post.id) }
+                                onUnlike = { newsFeedViewModel.unlikePost(post.id) },
+                                navController = navController
                             )
                         }
                     }
@@ -87,7 +106,7 @@ fun PostScreen(navController: NavController, newsFeedViewModel: NewsFeedViewMode
 }
 
 @Composable
-fun PostItem(post: PostResponseDto, onLike: () -> Unit, onUnlike: () -> Unit) {
+fun PostItem(post: PostResponseDto, onLike: () -> Unit, onUnlike: () -> Unit, navController: NavController) {
     val dateFormat = remember { SimpleDateFormat("dd MMMM yyyy", Locale.getDefault()) }
 
     Card(
@@ -107,6 +126,8 @@ fun PostItem(post: PostResponseDto, onLike: () -> Unit, onUnlike: () -> Unit) {
                     modifier = Modifier
                         .size(48.dp)
                         .clip(CircleShape)
+                        .clickable { navController.navigate("${ScreenName.Profile}/${post.userId}") }
+
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Column {
