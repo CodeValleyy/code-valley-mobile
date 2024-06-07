@@ -35,4 +35,3 @@ data class Comment(
     val createdAt: Date,
     val hasLiked: Boolean
 )
-
