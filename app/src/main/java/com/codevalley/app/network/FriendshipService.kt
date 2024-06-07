@@ -1,6 +1,7 @@
 package com.codevalley.app.network
 
 import com.codevalley.app.model.FriendshipResponseDTO
+import com.codevalley.app.model.RawFriendshipResponseDTO
 import com.codevalley.app.model.UserFriendDTO
 import com.codevalley.app.model.UserQueryDTO
 import retrofit2.http.*
@@ -31,7 +32,7 @@ interface FriendshipService {
     suspend fun listFriends(): List<UserFriendDTO>
 
     @GET("/friendships/status")
-    suspend fun getFriendshipStatus(@Query("friendId") friendId: Int): FriendshipResponseDTO
+    suspend fun getFriendshipStatus(@Query("friendId") friendId: Int): RawFriendshipResponseDTO
 
     @GET("/friendships/suggestions")
     suspend fun listFriendSuggestions(): List<UserQueryDTO>

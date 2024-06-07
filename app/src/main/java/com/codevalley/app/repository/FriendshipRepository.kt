@@ -1,6 +1,7 @@
 package com.codevalley.app.repository
 
 import com.codevalley.app.model.FriendshipResponseDTO
+import com.codevalley.app.model.FriendshipStatus
 import com.codevalley.app.model.UserFriendDTO
 import com.codevalley.app.model.UserQueryDTO
 import com.codevalley.app.network.FriendshipService
@@ -58,7 +59,8 @@ class FriendshipRepository @Inject constructor(
 
     suspend fun getFriendshipStatus(friendId: Int): FriendshipResponseDTO {
         val friendshipService = createAuthorizedApiService()
-        return friendshipService.getFriendshipStatus(friendId)
+        val response = friendshipService.getFriendshipStatus(friendId)
+        return response.toFriendshipResponseDTO()
     }
 
     suspend fun listFriendSuggestions(): List<UserQueryDTO> {

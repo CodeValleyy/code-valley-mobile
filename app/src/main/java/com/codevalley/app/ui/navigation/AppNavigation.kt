@@ -7,7 +7,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.codevalley.app.ui.screens.LoginScreen
 import com.codevalley.app.ui.screens.MainScreen
-import com.codevalley.app.ui.screens.PostScreen
+import com.codevalley.app.ui.screens.NewsFeedScreenn
 import com.codevalley.app.ui.screens.ProfileScreen
 import com.codevalley.app.ui.screens.RegisterScreen
 import com.codevalley.app.ui.screens.SettingsScreen
@@ -35,7 +35,7 @@ fun AppNavigation(navController: NavHostController = rememberNavController()) {
             SettingsScreen(navController)
         }
         composable(ScreenName.NewsFeed.toString()) {
-            PostScreen(navController)
+            NewsFeedScreenn(navController)
         }
     }
 }

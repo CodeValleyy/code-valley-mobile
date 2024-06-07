@@ -27,15 +27,19 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
+import com.codevalley.app.model.FriendshipStatus
 import com.codevalley.app.model.PostResponseDto
+import com.codevalley.app.repository.FriendshipRepository
 import com.codevalley.app.ui.components.LoadingIndicator
 import com.codevalley.app.ui.navigation.ScreenName
 import com.codevalley.app.ui.viewmodel.NewsFeedViewModel
+import retrofit2.HttpException
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.Exception
 
 @Composable
-fun PostScreen(navController: NavController, newsFeedViewModel: NewsFeedViewModel = hiltViewModel()) {
+fun NewsFeedScreenn(navController: NavController, newsFeedViewModel: NewsFeedViewModel = hiltViewModel()) {
     val posts by newsFeedViewModel.posts.collectAsState()
     val errorMessage by newsFeedViewModel.errorMessage.collectAsState()
     val isLoading by newsFeedViewModel.isLoading.collectAsState()
@@ -114,7 +118,8 @@ fun PostScreen(navController: NavController, newsFeedViewModel: NewsFeedViewMode
                                 post = post,
                                 onLike = { newsFeedViewModel.likePost(post.id) },
                                 onUnlike = { newsFeedViewModel.unlikePost(post.id) },
-                                navController = navController
+                                navController = navController,
+                                viewModel = newsFeedViewModel
                             )
                         }
                     }
@@ -125,8 +130,29 @@ fun PostScreen(navController: NavController, newsFeedViewModel: NewsFeedViewMode
 }
 
 @Composable
-fun PostItem(post: PostResponseDto, onLike: () -> Unit, onUnlike: () -> Unit, navController: NavController) {
+fun PostItem(
+    post: PostResponseDto,
+    onLike: () -> Unit,
+    onUnlike: () -> Unit,
+    navController: NavController,
+    viewModel: NewsFeedViewModel
+) {
     val dateFormat = remember { SimpleDateFormat("dd MMMM yyyy", Locale.getDefault()) }
+    var friendshipStatus by remember { mutableStateOf<FriendshipStatus?>(null) }
+    var isLoadingFriendshipStatus by remember { mutableStateOf(true) }
+
+    LaunchedEffect(post.userId) {
+        isLoadingFriendshipStatus = true
+        try {
+            friendshipStatus = viewModel.getFriendshipStatus(post.userId)
+        } catch (e: Exception) {
+            if (e is HttpException && e.code() == 404) {
+                friendshipStatus = null // Not friends
+            }
+        } finally {
+            isLoadingFriendshipStatus = false
+        }
+    }
 
     Card(
         modifier = Modifier
@@ -146,19 +172,38 @@ fun PostItem(post: PostResponseDto, onLike: () -> Unit, onUnlike: () -> Unit, na
                         .size(48.dp)
                         .clip(CircleShape)
                         .clickable { navController.navigate("${ScreenName.Profile}/${post.userId}") }
-
                 )
                 Spacer(modifier = Modifier.width(8.dp))
-                Column {
+                Column (
+                    modifier = Modifier.clickable { navController.navigate("${ScreenName.Profile}/${post.userId}") }
+                )
+                {
                     Text(post.username, fontWeight = FontWeight.Bold)
                     Text(dateFormat.format(post.createdAt), style = MaterialTheme.typography.body2)
                 }
                 Spacer(modifier = Modifier.weight(1f))
-                Button(onClick = { /* Follow user */ }) {
-                    Text("Following")
+                if (isLoadingFriendshipStatus) {
+                    CircularProgressIndicator(modifier = Modifier.size(24.dp))
+                } else {
+                    Button(onClick = {
+                        if (friendshipStatus == null) {
+                            viewModel.sendFriendRequest(post.userId)
+                            friendshipStatus = FriendshipStatus.PENDING
+                        } else {
+                            viewModel.removeFriend(post.userId)
+                            friendshipStatus = null
+                        }
+                    }) {
+                        Text(
+                            text = when (friendshipStatus) {
+                                FriendshipStatus.PENDING, FriendshipStatus.ACCEPTED -> "Following"
+                                else -> "Follow"
+                            }
+                        )
+                    }
                 }
             }
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(10.dp))
             Text(post.content, style = MaterialTheme.typography.body1)
             Spacer(modifier = Modifier.height(8.dp))
             Image(
@@ -167,9 +212,7 @@ fun PostItem(post: PostResponseDto, onLike: () -> Unit, onUnlike: () -> Unit, na
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxWidth()
             )
-            Spacer(modifier = Modifier.height(8.dp))
-            Text("Voici mon script python qui me permet de donner les chiffres au carré")
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(5.dp))
             Row(verticalAlignment = Alignment.CenterVertically) {
                 IconButton(onClick = if (post.userHasLiked) onUnlike else onLike) {
                     Icon(
