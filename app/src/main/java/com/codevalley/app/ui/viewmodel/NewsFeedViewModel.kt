@@ -8,11 +8,10 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import java.lang.Thread.State
 import javax.inject.Inject
 
 @HiltViewModel
-class PostViewModel @Inject constructor(
+class NewsFeedViewModel @Inject constructor(
     private val postRepository: PostRepository
 ) : ViewModel() {
 
@@ -25,11 +24,11 @@ class PostViewModel @Inject constructor(
     private val _errorMessage = MutableStateFlow("")
     val errorMessage: StateFlow<String> = _errorMessage
 
-    fun loadPosts(token: String) {
+    fun loadPosts() {
         viewModelScope.launch {
             _isLoading.value = true
             try {
-                val posts = postRepository.getPosts(token)
+                val posts = postRepository.getPosts()
                 _posts.value = posts
                 _isLoading.value = false
             } catch (e: Exception) {
@@ -38,22 +37,22 @@ class PostViewModel @Inject constructor(
         }
     }
 
-    fun likePost(token: String, postId: Int) {
+    fun likePost(postId: Int) {
         viewModelScope.launch {
             try {
-                postRepository.likePost(token, postId)
-                loadPosts(token)
+                postRepository.likePost(postId)
+                loadPosts()
             } catch (e: Exception) {
                 _errorMessage.value = "Failed to like post."
             }
         }
     }
 
-    fun unlikePost(token: String, postId: Int) {
+    fun unlikePost(postId: Int) {
         viewModelScope.launch {
             try {
-                postRepository.unlikePost(token, postId)
-                loadPosts(token)
+                postRepository.unlikePost(postId)
+                loadPosts()
             } catch (e: Exception) {
                 _errorMessage.value = "Failed to unlike post."
             }

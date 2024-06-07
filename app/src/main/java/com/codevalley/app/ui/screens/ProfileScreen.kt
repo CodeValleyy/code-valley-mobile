@@ -30,6 +30,7 @@ import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
 import com.codevalley.app.R
 import com.codevalley.app.ui.components.LoadingIndicator
+import com.codevalley.app.ui.navigation.ScreenName
 import com.codevalley.app.ui.viewmodel.ProfileViewModel
 
 @Composable

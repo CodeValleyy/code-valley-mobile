@@ -42,7 +42,7 @@ class LoginViewModel @Inject constructor(
                         password = ""
                         errorMessage = ""
                         isWaiting = false
-                        navController.navigate(ScreenName.Profile.toString())
+                        navController.navigate(ScreenName.NewsFeed.toString())
                     }
                     is ApiAuthResponse.Error -> {
                         val error = apiResponse.error

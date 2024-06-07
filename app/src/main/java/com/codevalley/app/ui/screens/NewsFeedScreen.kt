@@ -28,19 +28,19 @@ import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.codevalley.app.model.PostResponseDto
 import com.codevalley.app.ui.components.LoadingIndicator
-import com.codevalley.app.ui.viewmodel.PostViewModel
+import com.codevalley.app.ui.viewmodel.NewsFeedViewModel
 import java.text.SimpleDateFormat
 import java.util.*
 
 @Composable
-fun PostScreen(navController: NavController, token: String, postViewModel: PostViewModel = hiltViewModel()) {
-    val posts by postViewModel.posts.collectAsState()
-    val errorMessage by postViewModel.errorMessage.collectAsState()
-    val isLoading by postViewModel.isLoading.collectAsState()
+fun PostScreen(navController: NavController, newsFeedViewModel: NewsFeedViewModel = hiltViewModel()) {
+    val posts by newsFeedViewModel.posts.collectAsState()
+    val errorMessage by newsFeedViewModel.errorMessage.collectAsState()
+    val isLoading by newsFeedViewModel.isLoading.collectAsState()
     val context = LocalContext.current
 
     LaunchedEffect(Unit) {
-        postViewModel.loadPosts(token)
+        newsFeedViewModel.loadPosts()
     }
 
     Scaffold(
@@ -75,8 +75,8 @@ fun PostScreen(navController: NavController, token: String, postViewModel: PostV
                         items(posts) { post ->
                             PostItem(
                                 post = post,
-                                onLike = { postViewModel.likePost(token, post.id) },
-                                onUnlike = { postViewModel.unlikePost(token, post.id) }
+                                onLike = { newsFeedViewModel.likePost(post.id) },
+                                onUnlike = { newsFeedViewModel.unlikePost(post.id) }
                             )
                         }
                     }

@@ -36,10 +36,9 @@ fun AppNavigation() {
         composable(ScreenName.Settings.toString()) {
             SettingsScreen(navController)
         }
-        composable("post") {
+        composable(ScreenName.NewsFeed.toString()) {
             PostScreen(
                 navController = navController,
-                token = Constants.BEARER_TOKEN
             )
         }
 
