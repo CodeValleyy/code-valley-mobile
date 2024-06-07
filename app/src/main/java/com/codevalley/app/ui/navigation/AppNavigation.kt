@@ -5,6 +5,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.codevalley.app.ui.screens.PostDetailScreen
 import com.codevalley.app.ui.screens.LoginScreen
 import com.codevalley.app.ui.screens.MainScreen
 import com.codevalley.app.ui.screens.NewsFeedScreen
@@ -36,6 +37,15 @@ fun AppNavigation(navController: NavHostController = rememberNavController()) {
         }
         composable(ScreenName.NewsFeed.toString()) {
             NewsFeedScreen(navController)
+        }
+
+        composable("${ScreenName.PostDetail}/{post.id}") { backStackEntry ->
+            val postId = backStackEntry.arguments?.getString("post.id")?.toIntOrNull()
+            if (postId != null) {
+                PostDetailScreen(postId, navController)
+            } else {
+                // Handle error
+            }
         }
     }
 }

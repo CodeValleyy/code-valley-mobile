@@ -10,7 +10,7 @@ import com.codevalley.app.ui.navigation.AppNavigation
 import com.codevalley.app.ui.navigation.ScreenName
 import com.codevalley.app.ui.theme.CodeValleyTheme
 import com.codevalley.app.utils.TokenManager
-import com.codevalley.app.utils.UserStore
+import com.codevalley.app.store.UserStore
 import com.codevalley.app.repository.UserRepository
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch

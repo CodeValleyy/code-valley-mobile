@@ -43,6 +43,7 @@ fun PostItem(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
+            .clickable { navController.navigate("${ScreenName.PostDetail}/${post.id}") }
     ) {
         Column(
             modifier = Modifier
