@@ -2,6 +2,7 @@ package com.codevalley.app.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.codevalley.app.model.CreatePostDto
 import com.codevalley.app.model.FriendshipStatus
 import com.codevalley.app.model.PostResponseDto
 import com.codevalley.app.model.UserResponseDTO
@@ -94,10 +95,33 @@ class NewsFeedViewModel @Inject constructor(
             status.status
         } catch (e: HttpException) {
             if (e.code() == 404) {
-                null
+                null // Not friends
             } else {
                 throw e
             }
         }
+    }
+
+    fun createPost(content: CreatePostDto) {
+        viewModelScope.launch {
+            try {
+                postRepository.createPost(content)
+                loadPosts()
+            } catch (e: Exception) {
+                _errorMessage.value = "Failed to create post."
+            }
+        }
+    }
+
+    fun deletePost(id: Int) {
+        viewModelScope.launch {
+            try {
+                postRepository.deletePost(id)
+                loadPosts()
+            } catch (e: Exception) {
+                _errorMessage.value = "Failed to delete post."
+            }
+        }
+
     }
 }

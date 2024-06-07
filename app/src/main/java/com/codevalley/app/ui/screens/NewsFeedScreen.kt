@@ -1,18 +1,19 @@
 package com.codevalley.app.ui.screens
 
+import android.net.Uri
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.FavoriteBorder
+
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.outlined.Email
 import androidx.compose.material.icons.outlined.Share
 import androidx.compose.runtime.*
@@ -22,15 +23,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
-import com.codevalley.app.model.FriendshipStatus
-import com.codevalley.app.model.PostResponseDto
-import com.codevalley.app.repository.FriendshipRepository
+import com.codevalley.app.model.CreatePostDto
+import com.codevalley.app.ui.components.CreatePostSection
 import com.codevalley.app.ui.components.LoadingIndicator
+import com.codevalley.app.ui.components.PostItem
 import com.codevalley.app.ui.navigation.ScreenName
 import com.codevalley.app.ui.viewmodel.NewsFeedViewModel
 import retrofit2.HttpException
@@ -39,13 +39,18 @@ import java.util.*
 import kotlin.Exception
 
 @Composable
-fun NewsFeedScreenn(navController: NavController, newsFeedViewModel: NewsFeedViewModel = hiltViewModel()) {
+fun NewsFeedScreen(navController: NavController, newsFeedViewModel: NewsFeedViewModel = hiltViewModel()) {
     val posts by newsFeedViewModel.posts.collectAsState()
     val errorMessage by newsFeedViewModel.errorMessage.collectAsState()
     val isLoading by newsFeedViewModel.isLoading.collectAsState()
     val context = LocalContext.current
     val userProfile = newsFeedViewModel.userProfile
     var searchQuery by remember { mutableStateOf("") }
+    var postContent by remember { mutableStateOf("") }
+    val imageUri by remember { mutableStateOf<Uri?>(null) }
+    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { _: Uri? ->
+       // imageUri = uri
+    }
 
     LaunchedEffect(Unit) {
         newsFeedViewModel.loadPosts()
@@ -102,14 +107,23 @@ fun NewsFeedScreenn(navController: NavController, newsFeedViewModel: NewsFeedVie
             )
         },
         content = { padding ->
-            Box(modifier = Modifier.fillMaxSize().padding(padding)) {
+            Column(modifier = Modifier.fillMaxSize().padding(padding)) {
+                CreatePostSection(
+                    postContent = postContent,
+                    onPostContentChange = { postContent = it },
+                    onPostClick = {
+                        newsFeedViewModel.createPost(CreatePostDto(postContent))
+                        postContent = ""
+                    },
+                    imageUri = imageUri,
+                    onPickImageClick = { launcher.launch("image/*") }
+                )
                 if (isLoading) {
                     LoadingIndicator()
                 } else {
                     if (errorMessage.isNotEmpty()) {
                         Toast.makeText(context, errorMessage, Toast.LENGTH_SHORT).show()
                     }
-
                     LazyColumn(
                         modifier = Modifier.fillMaxSize()
                     ) {
@@ -127,117 +141,4 @@ fun NewsFeedScreenn(navController: NavController, newsFeedViewModel: NewsFeedVie
             }
         }
     )
-}
-
-@Composable
-fun PostItem(
-    post: PostResponseDto,
-    onLike: () -> Unit,
-    onUnlike: () -> Unit,
-    navController: NavController,
-    viewModel: NewsFeedViewModel
-) {
-    val dateFormat = remember { SimpleDateFormat("dd MMMM yyyy", Locale.getDefault()) }
-    var friendshipStatus by remember { mutableStateOf<FriendshipStatus?>(null) }
-    var isLoadingFriendshipStatus by remember { mutableStateOf(true) }
-
-    LaunchedEffect(post.userId) {
-        isLoadingFriendshipStatus = true
-        try {
-            friendshipStatus = viewModel.getFriendshipStatus(post.userId)
-        } catch (e: Exception) {
-            if (e is HttpException && e.code() == 404) {
-                friendshipStatus = null // Not friends
-            }
-        } finally {
-            isLoadingFriendshipStatus = false
-        }
-    }
-
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp)
-    ) {
-        Column(
-            modifier = Modifier
-                .background(Color.White)
-                .padding(16.dp)
-        ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Image(
-                    painter = rememberAsyncImagePainter(post.avatar),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .size(48.dp)
-                        .clip(CircleShape)
-                        .clickable { navController.navigate("${ScreenName.Profile}/${post.userId}") }
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Column (
-                    modifier = Modifier.clickable { navController.navigate("${ScreenName.Profile}/${post.userId}") }
-                )
-                {
-                    Text(post.username, fontWeight = FontWeight.Bold)
-                    Text(dateFormat.format(post.createdAt), style = MaterialTheme.typography.body2)
-                }
-                Spacer(modifier = Modifier.weight(1f))
-                if (isLoadingFriendshipStatus) {
-                    CircularProgressIndicator(modifier = Modifier.size(24.dp))
-                } else {
-                    Button(onClick = {
-                        if (friendshipStatus == null) {
-                            viewModel.sendFriendRequest(post.userId)
-                            friendshipStatus = FriendshipStatus.PENDING
-                        } else {
-                            viewModel.removeFriend(post.userId)
-                            friendshipStatus = null
-                        }
-                    }) {
-                        Text(
-                            text = when (friendshipStatus) {
-                                FriendshipStatus.PENDING, FriendshipStatus.ACCEPTED -> "Following"
-                                else -> "Follow"
-                            }
-                        )
-                    }
-                }
-            }
-            Spacer(modifier = Modifier.height(10.dp))
-            Text(post.content, style = MaterialTheme.typography.body1)
-            Spacer(modifier = Modifier.height(8.dp))
-            Image(
-                painter = rememberAsyncImagePainter("data:image/png;base64,${post.avatar}"),
-                contentDescription = "Post Image",
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.fillMaxWidth()
-            )
-            Spacer(modifier = Modifier.height(5.dp))
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                IconButton(onClick = if (post.userHasLiked) onUnlike else onLike) {
-                    Icon(
-                        imageVector = if (post.userHasLiked) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
-                        contentDescription = null
-                    )
-                }
-                Text("${post.likes}")
-                Spacer(modifier = Modifier.width(16.dp))
-                IconButton(onClick = { /* Comment on post */ }) {
-                    Icon(
-                        imageVector = Icons.Outlined.Email,
-                        contentDescription = "Comment on post"
-                    )
-                }
-                Text("12")
-                Spacer(modifier = Modifier.width(16.dp))
-                IconButton(onClick = { /* Share post */ }) {
-                    Icon(
-                        imageVector = Icons.Outlined.Share,
-                        contentDescription = "Share post"
-                    )
-                }
-                Text("36")
-            }
-        }
-    }
 }
