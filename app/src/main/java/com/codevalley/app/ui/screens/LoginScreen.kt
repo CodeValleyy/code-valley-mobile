@@ -24,6 +24,7 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -53,6 +54,10 @@ fun LoginScreen(navController: NavController, loginViewModel: LoginViewModel = h
         withStyle(style = SpanStyle(color = Color.Blue, textDecoration = TextDecoration.Underline)) {
             append("Register")
         }
+    }
+
+    LaunchedEffect(Unit) {
+        loginViewModel.initialize(navController)
     }
 
     BackHandler {

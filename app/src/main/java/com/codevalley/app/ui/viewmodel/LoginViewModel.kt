@@ -24,6 +24,25 @@ class LoginViewModel @Inject constructor(
     var errorMessage by mutableStateOf("")
     var isWaiting by mutableStateOf(false)
 
+    fun initialize(navController: NavController) {
+        viewModelScope.launch {
+            checkIfUserIsLoggedIn(navController)
+        }
+    }
+
+
+    private suspend fun checkIfUserIsLoggedIn(navController: NavController) {
+        val token = TokenManager.token
+        if (token != null) {
+            try {
+                val profile = userRepository.getMe()
+                navController.navigate(ScreenName.NewsFeed.toString())
+            } catch (e: Exception) {
+                TokenManager.clearToken()
+            }
+        }
+    }
+
     fun login(navController: NavController) {
         if (email == "") {
             errorMessage = "Please enter an email"
@@ -48,7 +67,7 @@ class LoginViewModel @Inject constructor(
                         val error = apiResponse.error
                         isWaiting = false
                         errorMessage = error.getMessage()
-                        TokenManager.token = null
+                        TokenManager.clearToken()
                     }
                 }
             }
