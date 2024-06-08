@@ -164,9 +164,9 @@ fun ProfileScreen(userId: Int, navController: NavController, profileViewModel: P
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceEvenly
                         ) {
-                            ProfileStat(label = "Followers", value = "6.3k")
-                            ProfileStat(label = "Posts", value = "572")
-                            ProfileStat(label = "Following", value = "2.5k")
+                            ProfileStat(label = "Followers", value = "6.3k", onClick = { navController.navigate(ScreenName.Followers.toString()) })
+                            ProfileStat(label = "Posts", value = "572", onClick = { /* TODO: Handle click */ })
+                            ProfileStat(label = "Following", value = "2.5k", onClick = { /* TODO: Handle click */ })
                         }
                         Spacer(modifier = Modifier.height(16.dp))
                         // TODO: static content, replace with actual data
@@ -179,9 +179,10 @@ fun ProfileScreen(userId: Int, navController: NavController, profileViewModel: P
 }
 
 @Composable
-fun ProfileStat(label: String, value: String) {
+fun ProfileStat(label: String, value: String, onClick: () -> Unit) {
     Column(
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.clickable { onClick() }
     ) {
         Text(
             text = value,
@@ -211,6 +212,7 @@ fun ProfileScreenPreview() {
 fun ProfileStatPreview() {
     ProfileStat(
         label = "Followers",
-        value = "6.3k"
+        value = "6.3k",
+        onClick = { /* TODO: Handle click */ }
     )
 }

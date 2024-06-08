@@ -17,7 +17,7 @@ class FriendshipRepository @Inject constructor(
         return createAuthorizedApiService(retrofit, FriendshipService::class.java)
     }
 
-        suspend fun sendFriendRequest(receiverId: Int): FriendshipResponseDTO {
+    suspend fun sendFriendRequest(receiverId: Int): FriendshipResponseDTO {
         val friendshipService = createAuthorizedApiService()
         return friendshipService.sendFriendRequest(receiverId)
     }
