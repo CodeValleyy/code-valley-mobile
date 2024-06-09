@@ -15,6 +15,10 @@ object PostStore {
         return _posts.value.firstOrNull { it.id == postId }
     }
 
+    fun getPostsByUserId(userId: Int): List<PostResponseDto> {
+        return _posts.value.filter { it.userId == userId }
+    }
+
     fun getNumberOfPosts(): Int {
         return _posts.value.size
     }

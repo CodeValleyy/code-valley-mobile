@@ -9,6 +9,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -30,6 +31,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
 import com.codevalley.app.R
+import com.codevalley.app.model.PostResponseDto
 import com.codevalley.app.store.FriendshipStore
 import com.codevalley.app.store.PostStore
 import com.codevalley.app.ui.components.LoadingIndicator
@@ -51,6 +53,8 @@ fun ProfileScreen(userId: Int, navController: NavController,
     val numberOfPostsByUserId = PostStore.getNumberOfPostsByUserId(userId)
     val numberOfFollowers by followersViewModel.numberOfFollowers.collectAsState()
     val numberOfFollowing by followingViewModel.numberOfFollowing.collectAsState()
+    val userPosts by remember { mutableStateOf(PostStore.getPostsByUserId(userId)) }
+
     val imagePickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
@@ -99,8 +103,7 @@ fun ProfileScreen(userId: Int, navController: NavController,
                 }
             }
         )
-    }
-    else {
+    } else {
         profileState?.let { profile ->
             Surface(
                 modifier = Modifier.fillMaxSize(),
@@ -178,9 +181,7 @@ fun ProfileScreen(userId: Int, navController: NavController,
                                     Row(
                                         horizontalArrangement = Arrangement.SpaceEvenly,
                                         modifier = Modifier.fillMaxWidth()
-                                    )
-                                    {
-
+                                    ) {
                                         Button(onClick = { /* TODO: Handle button click */ }) {
                                             Text(text = "Message")
                                         }
@@ -211,8 +212,16 @@ fun ProfileScreen(userId: Int, navController: NavController,
                             })
                         }
                         Spacer(modifier = Modifier.height(16.dp))
-                        // TODO: static content, replace with actual data
                         Text("User posts here")
+                        LazyColumn(
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            items(userPosts) { post ->
+                                PostItem(post = post, onClick = {
+                                    navController.navigate("${ScreenName.PostDetail}/${post.id}")
+                                })
+                            }
+                        }
                     }
                 }
             }
@@ -236,6 +245,25 @@ fun ProfileStat(label: String, value: String, onClick: () -> Unit) {
             style = MaterialTheme.typography.body2,
             color = Color.Gray
         )
+    }
+}
+
+@Composable
+fun PostItem(post: PostResponseDto, onClick: () -> Unit) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp)
+            .clickable { onClick() },
+        elevation = 4.dp
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(text = post.username, fontWeight = FontWeight.Bold)
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(text = post.content)
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(text = "Likes: ${post.likes}", style = MaterialTheme.typography.body2)
+        }
     }
 }
 
