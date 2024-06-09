@@ -2,7 +2,7 @@ package com.codevalley.app.network
 
 import com.codevalley.app.model.FriendshipResponseDTO
 import com.codevalley.app.model.RawFriendshipResponseDTO
-import com.codevalley.app.model.UserFriendDTO
+import com.codevalley.app.model.UserItemDTO
 import com.codevalley.app.model.UserQueryDTO
 import retrofit2.http.*
 
@@ -20,20 +20,26 @@ interface FriendshipService {
     suspend fun removeFriend(@Path("friendId") friendId: Int)
 
     @GET("/friendships/requests")
-    suspend fun listPendingRequests(): List<UserFriendDTO>
+    suspend fun listPendingRequests(): List<UserItemDTO.FriendshipPending>
 
     @GET("/friendships/sent-requests")
-    suspend fun listSentRequests(): List<UserFriendDTO>
+    suspend fun listSentRequests(): List<UserItemDTO.FriendshipSent>
 
     @DELETE("/friendships/requests/{receiverId}")
     suspend fun cancelFriendRequest(@Path("receiverId") receiverId: Int)
 
     @GET("/friendships/list")
-    suspend fun listFriends(): List<UserFriendDTO>
+    suspend fun listFriends(): List<UserItemDTO.UserFriend>
+
+    @GET("/friendships/list/{userId}")
+    suspend fun listFriendsById(@Path("userId") userId: Int): List<UserItemDTO.UserFriend>
 
     @GET("/friendships/status")
     suspend fun getFriendshipStatus(@Query("friendId") friendId: Int): RawFriendshipResponseDTO
 
     @GET("/friendships/suggestions")
     suspend fun listFriendSuggestions(): List<UserQueryDTO>
+
+    @GET("/friendships/following/{currentUserId}/{targetUserId}")
+    suspend fun isFollowing(@Path("currentUserId") currentUserId: Int, @Path("targetUserId") targetUserId: Int): Boolean
 }

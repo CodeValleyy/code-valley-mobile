@@ -5,6 +5,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.codevalley.app.ui.screens.FollowersScreen
+import com.codevalley.app.ui.screens.FollowingScreen
 import com.codevalley.app.ui.screens.PostDetailScreen
 import com.codevalley.app.ui.screens.LoginScreen
 import com.codevalley.app.ui.screens.MainScreen
@@ -29,7 +31,7 @@ fun AppNavigation(navController: NavHostController = rememberNavController()) {
             val userId = backStackEntry.arguments?.getString("userId")?.toInt() ?: 1
             ProfileScreen(
                 userId = userId,
-                navController = navController
+                navController = navController,
             )
         }
         composable(ScreenName.Settings.toString()) {
@@ -46,6 +48,26 @@ fun AppNavigation(navController: NavHostController = rememberNavController()) {
             } else {
                 // Handle error
             }
+        }
+
+        composable("${ScreenName.Followers}/{profile.id}/{currentUser.id}") { backStackEntry ->
+            val profileId = backStackEntry.arguments?.getString("profile.id")?.toInt() ?: 1
+            val currentUserId = backStackEntry.arguments?.getString("currentUser.id")?.toInt() ?: 1
+            FollowersScreen(
+                navController = navController,
+                userId = profileId,
+                currentUserId = currentUserId
+            )
+        }
+
+        composable("${ScreenName.Following}/{profile.id}/{currentUser.id}") { backStackEntry ->
+            val profileId = backStackEntry.arguments?.getString("profile.id")?.toInt() ?: 1
+            val currentUserId = backStackEntry.arguments?.getString("currentUser.id")?.toInt() ?: 1
+            FollowingScreen(
+                navController = navController,
+                userId = profileId,
+                currentUserId = currentUserId
+            )
         }
     }
 }

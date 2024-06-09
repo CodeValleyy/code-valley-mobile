@@ -7,7 +7,9 @@ enum class ScreenName(private val value: String) {
     NewsFeed("newsfeed"),
     Profile("profile"),
     Settings("settings"),
-    PostDetail("postDetail");
+    PostDetail("postDetail"),
+    Followers("followers"),
+    Following("following");
 
     override fun toString(): String {
         return value

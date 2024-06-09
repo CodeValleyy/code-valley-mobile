@@ -11,9 +11,20 @@ object PostStore {
     fun setPosts(posts: List<PostResponseDto>) {
         _posts.value = posts
     }
-
     fun getPostById(postId: Int): PostResponseDto? {
         return _posts.value.firstOrNull { it.id == postId }
+    }
+
+    fun getPostsByUserId(userId: Int): List<PostResponseDto> {
+        return _posts.value.filter { it.userId == userId }
+    }
+
+    fun getNumberOfPosts(): Int {
+        return _posts.value.size
+    }
+
+    fun getNumberOfPostsByUserId(userId: Int): Int {
+        return _posts.value.count { it.userId == userId }
     }
 
     fun updatePost(postId: Int, update: (PostResponseDto) -> PostResponseDto) {

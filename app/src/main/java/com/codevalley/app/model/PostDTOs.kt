@@ -21,7 +21,7 @@ data class PostResponseDto(
     val userId: Int,
     val username: String,
     val createdAt: Date,
-    val avatar: String,
+    val avatar: String?,
     val likes: Int,
     val userHasLiked: Boolean
 )

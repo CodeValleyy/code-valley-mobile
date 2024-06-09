@@ -15,7 +15,11 @@ data class FriendshipResponseDTO(
     val receiverId: Int,
     val status: FriendshipStatus,
     val createdAt: Date
-)
+) {
+    fun map(function: () -> UserItemDTO.FriendshipSent): List<UserItemDTO.FriendshipSent> {
+        return listOf(function())
+    }
+}
 
 data class RawFriendshipResponseDTO(
     val id: Int,
