@@ -6,6 +6,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.codevalley.app.ui.screens.FollowersScreen
+import com.codevalley.app.ui.screens.FollowingScreen
 import com.codevalley.app.ui.screens.PostDetailScreen
 import com.codevalley.app.ui.screens.LoginScreen
 import com.codevalley.app.ui.screens.MainScreen
@@ -51,6 +52,12 @@ fun AppNavigation(navController: NavHostController = rememberNavController()) {
 
         composable("followers") {
             FollowersScreen(
+                navController = navController
+            )
+        }
+
+        composable("following") {
+            FollowingScreen(
                 navController = navController
             )
         }

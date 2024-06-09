@@ -3,12 +3,32 @@ package com.codevalley.app.model
 import com.google.gson.annotations.SerializedName
 import java.util.Date
 
-data class UserFriendDTO(
-    val id: Int,
-    val email: String,
-    val username: String
-)
+sealed class UserItemDTO {
+    data class FriendshipPending(
+        val id: Int,
+        val senderId: Int,
+        val status: FriendshipStatus,
+        val createdAt: Date,
+        val email: String,
+        val username: String
+    ) : UserItemDTO()
 
+    data class FriendshipSent(
+        val id: Int,
+        val receiverId: Int,
+        val status: FriendshipStatus,
+        val createdAt: Date,
+        val email: String,
+        val username: String
+    ) : UserItemDTO()
+
+    data class UserFriend(
+        val id: Int,
+        val email: String,
+        val username: String
+    ) : UserItemDTO()
+
+}
 data class UserQueryDTO(
     val id: Int,
     val email: String,

@@ -1,8 +1,7 @@
 package com.codevalley.app.repository
 
 import com.codevalley.app.model.FriendshipResponseDTO
-import com.codevalley.app.model.FriendshipStatus
-import com.codevalley.app.model.UserFriendDTO
+import com.codevalley.app.model.UserItemDTO
 import com.codevalley.app.model.UserQueryDTO
 import com.codevalley.app.network.FriendshipService
 import com.codevalley.app.network.createAuthorizedApiService
@@ -37,12 +36,12 @@ class FriendshipRepository @Inject constructor(
         friendshipService.removeFriend(friendId)
     }
 
-    suspend fun listPendingRequests(): List<UserFriendDTO> {
+    suspend fun listPendingRequests(): List<UserItemDTO.FriendshipPending> {
         val friendshipService = createAuthorizedApiService()
         return friendshipService.listPendingRequests()
     }
 
-    suspend fun listSentRequests(): List<UserFriendDTO> {
+    suspend fun listSentRequests(): List<UserItemDTO.FriendshipSent> {
         val friendshipService = createAuthorizedApiService()
         return friendshipService.listSentRequests()
     }
@@ -52,7 +51,7 @@ class FriendshipRepository @Inject constructor(
         friendshipService.cancelFriendRequest(receiverId)
     }
 
-    suspend fun listFriends(): List<UserFriendDTO> {
+    suspend fun listFriends(): List<UserItemDTO.UserFriend> {
         val friendshipService = createAuthorizedApiService()
         return friendshipService.listFriends()
     }

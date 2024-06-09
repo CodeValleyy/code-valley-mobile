@@ -8,7 +8,8 @@ enum class ScreenName(private val value: String) {
     Profile("profile"),
     Settings("settings"),
     PostDetail("postDetail"),
-    Followers("followers");
+    Followers("followers"),
+    Following("following");
 
     override fun toString(): String {
         return value

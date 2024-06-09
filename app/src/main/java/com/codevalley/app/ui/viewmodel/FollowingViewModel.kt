@@ -11,14 +11,14 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class FollowersViewModel @Inject constructor(
+class FollowingViewModel @Inject constructor(
     private val friendshipRepository: FriendshipRepository
 ) : ViewModel() {
-    private val _followers = MutableStateFlow<List<UserItemDTO.UserFriend>>(emptyList())
-    val followers: StateFlow<List<UserItemDTO.UserFriend>> = _followers
+    private val _following = MutableStateFlow<List<UserItemDTO.UserFriend>>(emptyList())
+    val following: StateFlow<List<UserItemDTO.UserFriend>> = _following
 
-    private val _pendingRequests = MutableStateFlow<List<UserItemDTO.FriendshipPending>>(emptyList())
-    val pendingRequests: StateFlow<List<UserItemDTO.FriendshipPending>> = _pendingRequests
+    private val _sentRequests = MutableStateFlow<List<UserItemDTO.FriendshipSent>>(emptyList())
+    val sentRequests: StateFlow<List<UserItemDTO.FriendshipSent>> = _sentRequests
 
     private val _isLoading = MutableStateFlow(true)
     val isLoading: StateFlow<Boolean> = _isLoading
@@ -26,42 +26,40 @@ class FollowersViewModel @Inject constructor(
     private val _errorMessage = MutableStateFlow("")
     val errorMessage: StateFlow<String> = _errorMessage
 
-    internal fun loadFollowers() {
+    fun loadFollowing() {
         viewModelScope.launch {
             _isLoading.value = true
             try {
-                val friends = friendshipRepository.listFriends()
-                val pending = friendshipRepository.listPendingRequests()
-                _followers.value = friends
-                _pendingRequests.value = pending
+                _following.value = friendshipRepository.listFriends()
                 _isLoading.value = false
             } catch (e: Exception) {
-                _errorMessage.value = "Failed to load followers."
+                _errorMessage.value = "Failed to load following."
                 _isLoading.value = false
             }
         }
     }
 
-    fun acceptRequest(friendshipId: Int) {
+    fun loadSentRequests() {
+        viewModelScope.launch {
+            _isLoading.value = true
+            try {
+                _sentRequests.value = friendshipRepository.listSentRequests()
+                _isLoading.value = false
+            } catch (e: Exception) {
+                _errorMessage.value = "Failed to load sent requests."
+                _isLoading.value = false
+            }
+        }
+    }
+
+    fun cancelRequest(receiverId: Int) {
         viewModelScope.launch {
             try {
-                println("friendshipId: $friendshipId")
-                friendshipRepository.acceptFriendRequest(friendshipId)
-                loadFollowers()
+                friendshipRepository.cancelFriendRequest(receiverId)
+                loadSentRequests()
             } catch (e: Exception) {
                 e.printStackTrace()
-                _errorMessage.value = "Failed to accept friend request."
-            }
-        }
-    }
-
-    fun declineRequest(friendshipId: Int) {
-        viewModelScope.launch {
-            try {
-                friendshipRepository.declineFriendRequest(friendshipId)
-                loadFollowers()
-            } catch (e: Exception) {
-                _errorMessage.value = "Failed to decline friend request."
+                _errorMessage.value = "Failed to cancel friend request."
             }
         }
     }
@@ -70,7 +68,7 @@ class FollowersViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 friendshipRepository.removeFriend(friendId)
-                loadFollowers()
+                loadFollowing()
             } catch (e: Exception) {
                 _errorMessage.value = "Failed to remove friend."
             }

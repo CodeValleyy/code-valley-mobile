@@ -19,24 +19,24 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.codevalley.app.model.UserItemDTO
 import com.codevalley.app.ui.components.LoadingIndicator
-import com.codevalley.app.ui.viewmodel.FollowersViewModel
+import com.codevalley.app.ui.viewmodel.FollowingViewModel
 
 @Composable
-fun FollowersScreen(navController: NavController, followersViewModel: FollowersViewModel = hiltViewModel()) {
-    val followers by followersViewModel.followers.collectAsState()
-    val pendingRequests by followersViewModel.pendingRequests.collectAsState()
-    val errorMessage by followersViewModel.errorMessage.collectAsState()
-    val isLoading by followersViewModel.isLoading.collectAsState()
+fun FollowingScreen(navController: NavController, followingViewModel: FollowingViewModel = hiltViewModel()) {
+    val following by followingViewModel.following.collectAsState()
+    val sentRequests by followingViewModel.sentRequests.collectAsState()
+    val errorMessage by followingViewModel.errorMessage.collectAsState()
+    val isLoading by followingViewModel.isLoading.collectAsState()
 
     LaunchedEffect(Unit) {
-        followersViewModel.loadFollowers()
-        println("FollowersScreen: LaunchedEffect, followers: $followers")
+        followingViewModel.loadFollowing()
+        followingViewModel.loadSentRequests()
     }
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Followers") },
+                title = { Text("Following") },
                 backgroundColor = MaterialTheme.colors.primary,
                 contentColor = Color.White,
                 navigationIcon = {
@@ -62,21 +62,19 @@ fun FollowersScreen(navController: NavController, followersViewModel: FollowersV
                         modifier = Modifier.fillMaxSize().background(Color.LightGray)
                     ) {
                         item {
-                            Text("Pending Requests", fontWeight = FontWeight.Bold, modifier = Modifier.padding(16.dp))
+                            Text("Sent Requests", fontWeight = FontWeight.Bold, modifier = Modifier.padding(16.dp))
                         }
-                        items(pendingRequests) { friendshipPending ->
-                            UserItem(user = friendshipPending, isPending = true, onAccept = {
-                                followersViewModel.acceptRequest(friendshipPending.id)
-                            }, onDecline = {
-                                followersViewModel.declineRequest(friendshipPending.id)
+                        items(sentRequests) { friendshipSent ->
+                            UserItem(user = friendshipSent, isPending = true, onCancel = {
+                                followingViewModel.cancelRequest(friendshipSent.receiverId)
                             })
                         }
                         item {
                             Text("Friends", fontWeight = FontWeight.Bold, modifier = Modifier.padding(16.dp))
                         }
-                        items(followers) { user ->
+                        items(following) { user ->
                             UserItem(user = user, isPending = false) {
-                                followersViewModel.removeFriend(user.id)
+                                followingViewModel.removeFriend(user.id)
                             }
                         }
                     }
@@ -87,7 +85,7 @@ fun FollowersScreen(navController: NavController, followersViewModel: FollowersV
 }
 
 @Composable
-fun UserItem(user: UserItemDTO, isPending: Boolean, onAccept: (() -> Unit)? = null, onDecline: (() -> Unit)? = null, onRemove: (() -> Unit)? = null) {
+fun UserItem(user: UserItemDTO.FriendshipSent, isPending: Boolean, onCancel: (() -> Unit)? = null, onRemove: (() -> Unit)? = null) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -102,31 +100,16 @@ fun UserItem(user: UserItemDTO, isPending: Boolean, onAccept: (() -> Unit)? = nu
             Column(
                 modifier = Modifier.weight(1f)
             ) {
-                when (user) {
-                    is UserItemDTO.FriendshipPending -> {
-                        Text(user.username, fontWeight = FontWeight.Bold)
-                        Text(user.email, style = MaterialTheme.typography.body2)
-                        if (isPending) {
-                            Button(onClick = onAccept!!) {
-                                Text("Accept")
-                            }
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Button(onClick = onDecline!!) {
-                                Text("Decline")
-                            }
-                        }
-                    }
-                    is UserItemDTO.UserFriend -> {
-                        Text(user.username, fontWeight = FontWeight.Bold)
-                        Text(user.email, style = MaterialTheme.typography.body2)
-                        if (!isPending) {
-                            Button(onClick = onRemove!!) {
-                                Text("Remove")
-                            }
-                        }
-                    }
-
-                    else -> {}
+                Text(user.username, fontWeight = FontWeight.Bold)
+                Text(user.email, style = MaterialTheme.typography.body2)
+            }
+            if (isPending) {
+                Button(onClick = onCancel!!) {
+                    Text("Cancel")
+                }
+            } else {
+                Button(onClick = onRemove!!) {
+                    Text("Remove")
                 }
             }
         }
