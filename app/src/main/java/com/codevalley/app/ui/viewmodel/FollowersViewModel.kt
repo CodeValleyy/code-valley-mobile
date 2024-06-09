@@ -36,6 +36,24 @@ class FollowersViewModel @Inject constructor(
                 _pendingRequests.value = pending
                 _isLoading.value = false
             } catch (e: Exception) {
+                e.printStackTrace()
+                _errorMessage.value = "Failed to load followers."
+                _isLoading.value = false
+            }
+        }
+    }
+
+    internal fun loadFollowers(userId: Int) {
+        viewModelScope.launch {
+            _isLoading.value = true
+            try {
+                val friends = friendshipRepository.listFriendsById(userId)
+                val pending = friendshipRepository.listPendingRequests()
+                _followers.value = friends
+                _pendingRequests.value = pending
+                _isLoading.value = false
+            } catch (e: Exception) {
+                e.printStackTrace()
                 _errorMessage.value = "Failed to load followers."
                 _isLoading.value = false
             }
@@ -45,7 +63,6 @@ class FollowersViewModel @Inject constructor(
     fun acceptRequest(friendshipId: Int) {
         viewModelScope.launch {
             try {
-                println("friendshipId: $friendshipId")
                 friendshipRepository.acceptFriendRequest(friendshipId)
                 loadFollowers()
             } catch (e: Exception) {

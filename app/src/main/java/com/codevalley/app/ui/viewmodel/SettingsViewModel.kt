@@ -45,7 +45,6 @@ class SettingsViewModel @Inject constructor(
                 val (qrCodeUrl, setupKey) = userRepository.generateTwoFactor()
                 _qrCodeUrl.value = qrCodeUrl
                 _setupKey.value = setupKey
-                println("QR code URL: $qrCodeUrl")
                 _isTwoFactorEnabled.value = true
             } catch (e: Exception) {
                 _errorMessage.value = "Failed to enable two-factor authentication."

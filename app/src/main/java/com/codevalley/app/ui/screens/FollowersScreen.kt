@@ -22,15 +22,18 @@ import com.codevalley.app.ui.components.LoadingIndicator
 import com.codevalley.app.ui.viewmodel.FollowersViewModel
 
 @Composable
-fun FollowersScreen(navController: NavController, followersViewModel: FollowersViewModel = hiltViewModel()) {
+fun FollowersScreen(navController: NavController, userId: Int, currentUserId: Int, followersViewModel: FollowersViewModel = hiltViewModel()) {
     val followers by followersViewModel.followers.collectAsState()
     val pendingRequests by followersViewModel.pendingRequests.collectAsState()
     val errorMessage by followersViewModel.errorMessage.collectAsState()
     val isLoading by followersViewModel.isLoading.collectAsState()
 
     LaunchedEffect(Unit) {
-        followersViewModel.loadFollowers()
-        println("FollowersScreen: LaunchedEffect, followers: $followers")
+        if (currentUserId == userId) {
+            followersViewModel.loadFollowers()
+        } else {
+            followersViewModel.loadFollowers(userId)
+        }
     }
 
     Scaffold(
@@ -61,15 +64,17 @@ fun FollowersScreen(navController: NavController, followersViewModel: FollowersV
                     LazyColumn(
                         modifier = Modifier.fillMaxSize().background(Color.LightGray)
                     ) {
-                        item {
-                            Text("Pending Requests", fontWeight = FontWeight.Bold, modifier = Modifier.padding(16.dp))
-                        }
-                        items(pendingRequests) { friendshipPending ->
-                            UserItem(user = friendshipPending, isPending = true, onAccept = {
-                                followersViewModel.acceptRequest(friendshipPending.id)
-                            }, onDecline = {
-                                followersViewModel.declineRequest(friendshipPending.id)
-                            })
+                        if (currentUserId == userId) {
+                            item {
+                                Text("Pending Requests", fontWeight = FontWeight.Bold, modifier = Modifier.padding(16.dp))
+                            }
+                            items(pendingRequests) { friendshipPending ->
+                                UserItem(user = friendshipPending, isPending = true, onAccept = {
+                                    followersViewModel.acceptRequest(friendshipPending.id)
+                                }, onDecline = {
+                                    followersViewModel.declineRequest(friendshipPending.id)
+                                })
+                            }
                         }
                         item {
                             Text("Friends", fontWeight = FontWeight.Bold, modifier = Modifier.padding(16.dp))

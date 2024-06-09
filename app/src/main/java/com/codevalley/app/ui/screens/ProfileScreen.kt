@@ -175,9 +175,17 @@ fun ProfileScreen(userId: Int, navController: NavController, profileViewModel: P
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceEvenly
                         ) {
-                            ProfileStat(label = "Followers", value = "6.3k", onClick = { navController.navigate(ScreenName.Followers.toString()) })
+                            ProfileStat(label = "Followers", value = "6.3k", onClick = {
+                                navController.navigate(ScreenName.Followers.toString() + "/${profile.id}/${currentUser?.id}") {
+                                    popUpTo(ScreenName.Profile.toString()) { inclusive = true }
+                                }
+                            })
                             ProfileStat(label = "Posts", value = "572", onClick = { /* TODO: Handle click */ })
-                            ProfileStat(label = "Following", value = "2.5k", onClick = { navController.navigate(ScreenName.Following.toString()) })
+                            ProfileStat(label = "Following", value = "2.5k", onClick = {
+                                navController.navigate(ScreenName.Following.toString() + "/${profile.id}/${currentUser?.id}") {
+                                    popUpTo(ScreenName.Profile.toString()) { inclusive = true }
+                                }
+                            })
                         }
                         Spacer(modifier = Modifier.height(16.dp))
                         // TODO: static content, replace with actual data

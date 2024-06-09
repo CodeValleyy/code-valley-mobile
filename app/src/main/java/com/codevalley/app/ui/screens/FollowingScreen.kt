@@ -22,7 +22,7 @@ import com.codevalley.app.ui.components.LoadingIndicator
 import com.codevalley.app.ui.viewmodel.FollowingViewModel
 
 @Composable
-fun FollowingScreen(navController: NavController, followingViewModel: FollowingViewModel = hiltViewModel()) {
+fun FollowingScreen(navController: NavController, userId: Int, currentUserId: Int, followingViewModel: FollowingViewModel = hiltViewModel()) {
     val following by followingViewModel.following.collectAsState()
     val sentRequests by followingViewModel.sentRequests.collectAsState()
     val errorMessage by followingViewModel.errorMessage.collectAsState()
@@ -61,13 +61,19 @@ fun FollowingScreen(navController: NavController, followingViewModel: FollowingV
                     LazyColumn(
                         modifier = Modifier.fillMaxSize().background(Color.LightGray)
                     ) {
-                        item {
-                            Text("Sent Requests", fontWeight = FontWeight.Bold, modifier = Modifier.padding(16.dp))
-                        }
-                        items(sentRequests) { friendshipSent ->
-                            UserItem(user = friendshipSent, isPending = true, onCancel = {
-                                followingViewModel.cancelRequest(friendshipSent.receiverId)
-                            })
+                        if (currentUserId == userId) {
+                            item {
+                                Text(
+                                    "Sent Requests",
+                                    fontWeight = FontWeight.Bold,
+                                    modifier = Modifier.padding(16.dp)
+                                )
+                            }
+                            items(sentRequests) { friendshipSent ->
+                                UserItem(user = friendshipSent, isPending = true, onCancel = {
+                                    followingViewModel.cancelRequest(friendshipSent.receiverId)
+                                })
+                            }
                         }
                         item {
                             Text("Friends", fontWeight = FontWeight.Bold, modifier = Modifier.padding(16.dp))

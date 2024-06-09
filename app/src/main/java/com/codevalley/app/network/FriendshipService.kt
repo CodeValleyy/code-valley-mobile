@@ -31,6 +31,9 @@ interface FriendshipService {
     @GET("/friendships/list")
     suspend fun listFriends(): List<UserItemDTO.UserFriend>
 
+    @GET("/friendships/list/{userId}")
+    suspend fun listFriendsById(@Path("userId") userId: Int): List<UserItemDTO.UserFriend>
+
     @GET("/friendships/status")
     suspend fun getFriendshipStatus(@Query("friendId") friendId: Int): RawFriendshipResponseDTO
 
