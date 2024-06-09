@@ -75,6 +75,7 @@ fun ProfileScreen(userId: Int, navController: NavController,
                 followingViewModel.loadFollowing()
             } else {
                 followersViewModel.loadFollowers(userId)
+                followingViewModel.loadFollowing(userId)
             }
         }
     }

@@ -32,7 +32,7 @@ fun FollowingScreen(navController: NavController, userId: Int, currentUserId: In
         if (currentUserId == userId) {
             followingViewModel.loadFollowing()
         } else {
-            followingViewModel.loadFollowingById(userId)
+            followingViewModel.loadFollowing(userId)
         }
     }
 

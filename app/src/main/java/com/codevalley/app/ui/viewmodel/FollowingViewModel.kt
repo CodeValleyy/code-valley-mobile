@@ -44,7 +44,7 @@ class FollowingViewModel @Inject constructor(
         }
     }
 
-    fun loadFollowingById(userId: Int) {
+    fun loadFollowing(userId: Int) {
         viewModelScope.launch {
             _isLoading.value = true
             try {
