@@ -68,4 +68,8 @@ class FriendshipRepository @Inject constructor(
     suspend fun listFriendSuggestions(): List<UserQueryDTO> {
         return friendshipService.listFriendSuggestions()
     }
+
+    suspend fun isFollowing(currentUserId: Int, targetUserId: Int): Boolean {
+        return friendshipService.isFollowing(currentUserId, targetUserId)
+    }
 }

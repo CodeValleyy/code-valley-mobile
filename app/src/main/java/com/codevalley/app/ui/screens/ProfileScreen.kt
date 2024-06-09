@@ -54,6 +54,7 @@ fun ProfileScreen(userId: Int, navController: NavController,
     val numberOfFollowers by followersViewModel.numberOfFollowers.collectAsState()
     val numberOfFollowing by followingViewModel.numberOfFollowing.collectAsState()
     val userPosts by remember { mutableStateOf(PostStore.getPostsByUserId(userId)) }
+    val isFollowing by profileViewModel::isFollowing
 
     val imagePickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
@@ -183,11 +184,14 @@ fun ProfileScreen(userId: Int, navController: NavController,
                                         horizontalArrangement = Arrangement.SpaceEvenly,
                                         modifier = Modifier.fillMaxWidth()
                                     ) {
-                                        Button(onClick = { /* TODO: Handle button click */ }) {
-                                            Text(text = "Message")
-                                        }
-                                        Button(onClick = { /* TODO: Handle button click */ }) {
-                                            Text(text = "Follow")
+                                        Button(onClick = {
+                                            if (isFollowing) {
+                                                profileViewModel.unfollowUser(userId)
+                                            } else {
+                                                profileViewModel.followUser(userId)
+                                            }
+                                        }) {
+                                            Text(text = if (isFollowing) "Unfollow" else "Follow")
                                         }
                                     }
                                 }

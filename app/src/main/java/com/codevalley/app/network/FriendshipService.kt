@@ -39,4 +39,7 @@ interface FriendshipService {
 
     @GET("/friendships/suggestions")
     suspend fun listFriendSuggestions(): List<UserQueryDTO>
+
+    @GET("/friendships/following/{currentUserId}/{targetUserId}")
+    suspend fun isFollowing(@Path("currentUserId") currentUserId: Int, @Path("targetUserId") targetUserId: Int): Boolean
 }
