@@ -29,8 +29,11 @@ fun FollowingScreen(navController: NavController, userId: Int, currentUserId: In
     val isLoading by followingViewModel.isLoading.collectAsState()
 
     LaunchedEffect(Unit) {
-        followingViewModel.loadFollowing()
-        followingViewModel.loadSentRequests()
+        if (currentUserId == userId) {
+            followingViewModel.loadFollowing()
+        } else {
+            followingViewModel.loadFollowingById(userId)
+        }
     }
 
     Scaffold(

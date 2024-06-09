@@ -20,6 +20,9 @@ class FollowingViewModel @Inject constructor(
     private val _sentRequests = MutableStateFlow<List<UserItemDTO.FriendshipSent>>(emptyList())
     val sentRequests: StateFlow<List<UserItemDTO.FriendshipSent>> = _sentRequests
 
+    private val _numberOfFollowing = MutableStateFlow(0)
+    val numberOfFollowing: StateFlow<Int> = _numberOfFollowing
+
     private val _isLoading = MutableStateFlow(true)
     val isLoading: StateFlow<Boolean> = _isLoading
 
@@ -31,6 +34,8 @@ class FollowingViewModel @Inject constructor(
             _isLoading.value = true
             try {
                 _following.value = friendshipRepository.listFriends()
+                _sentRequests.value = friendshipRepository.listSentRequests()
+                _numberOfFollowing.value = _following.value.size + _sentRequests.value.size
                 _isLoading.value = false
             } catch (e: Exception) {
                 _errorMessage.value = "Failed to load following."
@@ -39,11 +44,27 @@ class FollowingViewModel @Inject constructor(
         }
     }
 
+    fun loadFollowingById(userId: Int) {
+        viewModelScope.launch {
+            _isLoading.value = true
+            try {
+                _following.value = friendshipRepository.listFriendsById(userId)
+                _numberOfFollowing.value = _following.value.size
+                _isLoading.value = false
+            } catch (e: Exception) {
+                _errorMessage.value = "Failed to load following."
+                _isLoading.value = false
+            }
+        }
+    }
+
+
     fun loadSentRequests() {
         viewModelScope.launch {
             _isLoading.value = true
             try {
                 _sentRequests.value = friendshipRepository.listSentRequests()
+                _numberOfFollowing.value = _following.value.size + _sentRequests.value.size
                 _isLoading.value = false
             } catch (e: Exception) {
                 _errorMessage.value = "Failed to load sent requests."

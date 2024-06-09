@@ -5,13 +5,13 @@ import com.codevalley.app.model.UserItemDTO
 import com.codevalley.app.model.UserQueryDTO
 import com.codevalley.app.network.FriendshipService
 import com.codevalley.app.network.createAuthorizedApiService
+import com.codevalley.app.store.FriendshipStore
 import retrofit2.Retrofit
 import javax.inject.Inject
 
 class FriendshipRepository @Inject constructor(
     private val retrofit: Retrofit
 ) {
-
     private val friendshipService: FriendshipService by lazy {
         createAuthorizedApiService(retrofit, FriendshipService::class.java)
     }
@@ -33,11 +33,15 @@ class FriendshipRepository @Inject constructor(
     }
 
     suspend fun listPendingRequests(): List<UserItemDTO.FriendshipPending> {
-        return friendshipService.listPendingRequests()
+        val response = friendshipService.listPendingRequests()
+        FriendshipStore.setPendingRequests(response)
+        return response
     }
 
     suspend fun listSentRequests(): List<UserItemDTO.FriendshipSent> {
-        return friendshipService.listSentRequests()
+        val response = friendshipService.listSentRequests()
+        FriendshipStore.setSentRequests(response)
+        return response
     }
 
     suspend fun cancelFriendRequest(receiverId: Int) {
@@ -45,11 +49,15 @@ class FriendshipRepository @Inject constructor(
     }
 
     suspend fun listFriends(): List<UserItemDTO.UserFriend> {
-        return friendshipService.listFriends()
+        val response = friendshipService.listFriends()
+        FriendshipStore.setFriends(response)
+        return response
     }
 
     suspend fun listFriendsById(friendId: Int): List<UserItemDTO.UserFriend> {
-        return friendshipService.listFriendsById(friendId)
+        val response = friendshipService.listFriendsById(friendId)
+        FriendshipStore.setFriends(response)
+        return response
     }
 
     suspend fun getFriendshipStatus(friendId: Int): FriendshipResponseDTO {

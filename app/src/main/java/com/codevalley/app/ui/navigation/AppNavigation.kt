@@ -1,8 +1,6 @@
 package com.codevalley.app.ui.navigation
 
 import androidx.compose.runtime.Composable
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -16,12 +14,9 @@ import com.codevalley.app.ui.screens.NewsFeedScreen
 import com.codevalley.app.ui.screens.ProfileScreen
 import com.codevalley.app.ui.screens.RegisterScreen
 import com.codevalley.app.ui.screens.SettingsScreen
-import com.codevalley.app.ui.viewmodel.ProfileViewModel
-import com.codevalley.app.ui.viewmodel.SharedViewModel
-
 
 @Composable
-fun AppNavigation(navController: NavHostController = rememberNavController(), profileViewModel: ProfileViewModel = hiltViewModel()) {
+fun AppNavigation(navController: NavHostController = rememberNavController()) {
     NavHost(navController = navController, startDestination = ScreenName.Main.toString()) {
         composable(ScreenName.Main.toString()) {
             MainScreen(navController)

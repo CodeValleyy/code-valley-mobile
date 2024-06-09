@@ -20,6 +20,9 @@ class FollowersViewModel @Inject constructor(
     private val _pendingRequests = MutableStateFlow<List<UserItemDTO.FriendshipPending>>(emptyList())
     val pendingRequests: StateFlow<List<UserItemDTO.FriendshipPending>> = _pendingRequests
 
+    private val _numberOfFollowers = MutableStateFlow(0)
+    val numberOfFollowers: StateFlow<Int> = _numberOfFollowers
+
     private val _isLoading = MutableStateFlow(true)
     val isLoading: StateFlow<Boolean> = _isLoading
 
@@ -32,6 +35,8 @@ class FollowersViewModel @Inject constructor(
             try {
                 val friends = friendshipRepository.listFriends()
                 val pending = friendshipRepository.listPendingRequests()
+
+                _numberOfFollowers.value = friends.size + pending.size
                 _followers.value = friends
                 _pendingRequests.value = pending
                 _isLoading.value = false
@@ -49,6 +54,7 @@ class FollowersViewModel @Inject constructor(
             try {
                 val friends = friendshipRepository.listFriendsById(userId)
                 val pending = friendshipRepository.listPendingRequests()
+                _numberOfFollowers.value = friends.size
                 _followers.value = friends
                 _pendingRequests.value = pending
                 _isLoading.value = false

@@ -30,17 +30,27 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
 import com.codevalley.app.R
+import com.codevalley.app.store.FriendshipStore
+import com.codevalley.app.store.PostStore
 import com.codevalley.app.ui.components.LoadingIndicator
 import com.codevalley.app.ui.navigation.ScreenName
+import com.codevalley.app.ui.viewmodel.FollowersViewModel
+import com.codevalley.app.ui.viewmodel.FollowingViewModel
 import com.codevalley.app.ui.viewmodel.ProfileViewModel
 
 @Composable
-fun ProfileScreen(userId: Int, navController: NavController, profileViewModel: ProfileViewModel = hiltViewModel()) {
+fun ProfileScreen(userId: Int, navController: NavController,
+                  profileViewModel: ProfileViewModel = hiltViewModel(),
+                  followersViewModel: FollowersViewModel = hiltViewModel(),
+                  followingViewModel: FollowingViewModel = hiltViewModel()) {
     val profileState by profileViewModel::profile
     val currentUser by profileViewModel::currentUser
+    val isLoading by profileViewModel::isLoading
     val errorMessage by profileViewModel::errorMessage
     var imageUri by remember { mutableStateOf<Uri?>(null) }
-
+    val numberOfPostsByUserId = PostStore.getNumberOfPostsByUserId(userId)
+    val numberOfFollowers by followersViewModel.numberOfFollowers.collectAsState()
+    val numberOfFollowing by followingViewModel.numberOfFollowing.collectAsState()
     val imagePickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
@@ -52,6 +62,17 @@ fun ProfileScreen(userId: Int, navController: NavController, profileViewModel: P
 
     LaunchedEffect(Unit) {
         profileViewModel.loadProfile(userId)
+    }
+
+    LaunchedEffect(isLoading) {
+        if (!isLoading) {
+            if (currentUser?.id == userId) {
+                followersViewModel.loadFollowers()
+                followingViewModel.loadFollowing()
+            } else {
+                followersViewModel.loadFollowers(userId)
+            }
+        }
     }
 
     BackHandler {
@@ -175,13 +196,15 @@ fun ProfileScreen(userId: Int, navController: NavController, profileViewModel: P
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceEvenly
                         ) {
-                            ProfileStat(label = "Followers", value = "6.3k", onClick = {
+                            ProfileStat(label = "Followers", value = numberOfFollowers.toString(), onClick = {
                                 navController.navigate(ScreenName.Followers.toString() + "/${profile.id}/${currentUser?.id}") {
                                     popUpTo(ScreenName.Profile.toString()) { inclusive = true }
                                 }
                             })
-                            ProfileStat(label = "Posts", value = "572", onClick = { /* TODO: Handle click */ })
-                            ProfileStat(label = "Following", value = "2.5k", onClick = {
+                            ProfileStat(label = "Posts", value = numberOfPostsByUserId.toString(), onClick = {
+                                /* TODO: Handle click */
+                            })
+                            ProfileStat(label = "Following", value = numberOfFollowing.toString(), onClick = {
                                 navController.navigate(ScreenName.Following.toString() + "/${profile.id}/${currentUser?.id}") {
                                     popUpTo(ScreenName.Profile.toString()) { inclusive = true }
                                 }
