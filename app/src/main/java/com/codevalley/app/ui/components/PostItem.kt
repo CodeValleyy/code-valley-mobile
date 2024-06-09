@@ -82,21 +82,23 @@ fun PostItem(
             Spacer(modifier = Modifier.height(10.dp))
             Text(localPost.content, style = MaterialTheme.typography.body1)
             Spacer(modifier = Modifier.height(8.dp))
-            Image(
-                painter = rememberAsyncImagePainter("data:image/png;base64,${localPost.avatar ?: ""}"),
-                contentDescription = "Post Image",
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.fillMaxWidth()
-            )
-            Spacer(modifier = Modifier.height(5.dp))
+            if (!localPost.avatar.isNullOrEmpty()) {
+                Image(
+                    painter = rememberAsyncImagePainter("data:image/png;base64,${localPost.avatar}"),
+                    contentDescription = "Post Image",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(modifier = Modifier.height(5.dp))
+            }
             Row(verticalAlignment = Alignment.CenterVertically) {
                 IconButton(onClick = {
-                    if (localPost.userHasLiked) {
+                    localPost = if (localPost.userHasLiked) {
                         onUnlike()
-                        localPost = localPost.copy(userHasLiked = false, likes = localPost.likes - 1)
+                        localPost.copy(userHasLiked = false, likes = localPost.likes - 1)
                     } else {
                         onLike()
-                        localPost = localPost.copy(userHasLiked = true, likes = localPost.likes + 1)
+                        localPost.copy(userHasLiked = true, likes = localPost.likes + 1)
                     }
                 }) {
                     Icon(

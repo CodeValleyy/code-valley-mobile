@@ -87,7 +87,7 @@ fun PostDetailScreen(postId: Int, navController: NavController, newsFeedViewMode
                     CommentInputSection(commentText, onCommentTextChange = { commentText = it }, onPostComment = {
                         val newComment = Comment(
                             id = comments.size + 1,
-                            avatar = post.avatar,
+                            avatar = post.avatar ?: "",
                             username = userProfile?.username ?: "Anonymous",
                             content = commentText,
                             userId = userProfile?.id ?: 0,
