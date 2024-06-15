@@ -17,23 +17,26 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.codevalley.app.model.FriendshipStatus
 import com.codevalley.app.model.UserItemDTO
 import com.codevalley.app.ui.components.LoadingIndicator
 import com.codevalley.app.ui.viewmodel.FollowersViewModel
 
 @Composable
-fun FollowersScreen(navController: NavController, userId: Int, currentUserId: Int, followersViewModel: FollowersViewModel = hiltViewModel()) {
+fun FollowersScreen(
+    navController: NavController,
+    userId: Int,
+    currentUserId: Int,
+    followersViewModel: FollowersViewModel = hiltViewModel()
+) {
     val followers by followersViewModel.followers.collectAsState()
-    val pendingRequests by followersViewModel.pendingRequests.collectAsState()
     val errorMessage by followersViewModel.errorMessage.collectAsState()
     val isLoading by followersViewModel.isLoading.collectAsState()
+    var offset by remember { mutableIntStateOf(0) }
+    val limit = 10
 
     LaunchedEffect(Unit) {
-        if (currentUserId == userId) {
-            followersViewModel.loadFollowers()
-        } else {
-            followersViewModel.loadFollowers(userId)
-        }
+        followersViewModel.loadFollowers(userId, limit, offset)
     }
 
     Scaffold(
@@ -50,11 +53,12 @@ fun FollowersScreen(navController: NavController, userId: Int, currentUserId: In
             )
         },
         content = { padding ->
-            Box(modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(padding)
             ) {
-                if (isLoading) {
+                if (isLoading && followers.isEmpty()) {
                     LoadingIndicator()
                 } else {
                     if (errorMessage.isNotEmpty()) {
@@ -62,26 +66,27 @@ fun FollowersScreen(navController: NavController, userId: Int, currentUserId: In
                     }
 
                     LazyColumn(
-                        modifier = Modifier.fillMaxSize().background(Color.LightGray)
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(Color.LightGray)
                     ) {
-                        if (currentUserId == userId) {
-                            item {
-                                Text("Pending Requests", fontWeight = FontWeight.Bold, modifier = Modifier.padding(16.dp))
-                            }
-                            items(pendingRequests) { friendshipPending ->
-                                UserItem(user = friendshipPending, isPending = true, onAccept = {
-                                    followersViewModel.acceptRequest(friendshipPending.id)
-                                }, onDecline = {
-                                    followersViewModel.declineRequest(friendshipPending.id)
-                                })
-                            }
+                        items(followers) { user ->
+                            UserItem(
+                                user = user,
+                                onAccept = { followersViewModel.acceptRequest(user.id) },
+                                onRemove = if (currentUserId == userId) { { followersViewModel.removeFriend(user.id) } } else { null }
+                            )
                         }
                         item {
-                            Text("Friends", fontWeight = FontWeight.Bold, modifier = Modifier.padding(16.dp))
-                        }
-                        items(followers) { user ->
-                            UserItem(user = user, isPending = false) {
-                                followersViewModel.removeFriend(user.id)
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Button(
+                                onClick = {
+                                    offset += limit
+                                    followersViewModel.loadFollowers(userId, limit, offset = followers.size)
+                                },
+                                modifier = Modifier.fillMaxWidth().padding(16.dp)
+                            ) {
+                                Text("Load More")
                             }
                         }
                     }
@@ -92,7 +97,11 @@ fun FollowersScreen(navController: NavController, userId: Int, currentUserId: In
 }
 
 @Composable
-fun UserItem(user: UserItemDTO, isPending: Boolean, onAccept: (() -> Unit)? = null, onDecline: (() -> Unit)? = null, onRemove: (() -> Unit)? = null) {
+fun UserItem(
+    user: UserItemDTO.UserFriend,
+    onAccept: (() -> Unit)? = null,
+    onRemove: (() -> Unit)? = null
+) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -107,31 +116,18 @@ fun UserItem(user: UserItemDTO, isPending: Boolean, onAccept: (() -> Unit)? = nu
             Column(
                 modifier = Modifier.weight(1f)
             ) {
-                when (user) {
-                    is UserItemDTO.FriendshipPending -> {
-                        Text(user.username, fontWeight = FontWeight.Bold)
-                        Text(user.email, style = MaterialTheme.typography.body2)
-                        if (isPending) {
-                            Button(onClick = onAccept!!) {
-                                Text("Accept")
-                            }
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Button(onClick = onDecline!!) {
-                                Text("Decline")
-                            }
-                        }
+                Text(user.username, fontWeight = FontWeight.Bold)
+                Text(user.email, style = MaterialTheme.typography.body2)
+            }
+            if (user.status == FriendshipStatus.PENDING) {
+                Button(onClick = onAccept!!) {
+                    Text("Accept")
+                }
+            } else {
+                onRemove?.let {
+                    Button(onClick = it) {
+                        Text("Remove")
                     }
-                    is UserItemDTO.UserFriend -> {
-                        Text(user.username, fontWeight = FontWeight.Bold)
-                        Text(user.email, style = MaterialTheme.typography.body2)
-                        if (!isPending) {
-                            Button(onClick = onRemove!!) {
-                                Text("Remove")
-                            }
-                        }
-                    }
-
-                    else -> {}
                 }
             }
         }

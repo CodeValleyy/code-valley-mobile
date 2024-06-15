@@ -76,4 +76,15 @@ class ProfileViewModel @Inject constructor(
             }
         }
     }
+
+    fun countFollowersAndFollowing(userId: Int) {
+        viewModelScope.launch {
+            try {
+                friendshipRepository.fetchFollowersAndFollowingsCount(userId)
+            } catch (e: Exception) {
+                errorMessage = "Failed to count followers and following."
+            }
+        }
+
+    }
 }

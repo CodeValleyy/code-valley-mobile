@@ -25,10 +25,17 @@ sealed class UserItemDTO {
     data class UserFriend(
         val id: Int,
         val email: String,
-        val username: String
+        val username: String,
+        val status: FriendshipStatus,
+        val createdAt: Date,
     ) : UserItemDTO()
-
 }
+
+data class FollowersAndFollowingsCount(
+    val followers: Int,
+    val followings: Int
+)
+
 data class UserQueryDTO(
     val id: Int,
     val email: String,

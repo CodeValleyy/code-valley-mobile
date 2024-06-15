@@ -30,6 +30,7 @@ data class RawFriendshipResponseDTO(
 ) {
     fun toFriendshipResponseDTO(): FriendshipResponseDTO {
         val status = when (this.status) {
+            "none" -> FriendshipStatus.NONE
             "pending" -> FriendshipStatus.PENDING
             "accepted" -> FriendshipStatus.ACCEPTED
             "declined" -> FriendshipStatus.DECLINED
@@ -47,6 +48,7 @@ data class RawFriendshipResponseDTO(
 }
 
 enum class FriendshipStatus {
+    NONE,
     PENDING,
     ACCEPTED,
     DECLINED

@@ -8,6 +8,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -22,18 +23,18 @@ import com.codevalley.app.ui.components.LoadingIndicator
 import com.codevalley.app.ui.viewmodel.FollowingViewModel
 
 @Composable
-fun FollowingScreen(navController: NavController, userId: Int, currentUserId: Int, followingViewModel: FollowingViewModel = hiltViewModel()) {
+fun FollowingScreen(
+    navController: NavController,
+    userId: Int,
+    currentUserId: Int,
+    followingViewModel: FollowingViewModel = hiltViewModel()
+) {
     val following by followingViewModel.following.collectAsState()
-    val sentRequests by followingViewModel.sentRequests.collectAsState()
     val errorMessage by followingViewModel.errorMessage.collectAsState()
     val isLoading by followingViewModel.isLoading.collectAsState()
 
     LaunchedEffect(Unit) {
-        if (currentUserId == userId) {
-            followingViewModel.loadFollowing()
-        } else {
-            followingViewModel.loadFollowing(userId)
-        }
+        followingViewModel.loadFollowing(userId)
     }
 
     Scaffold(
@@ -50,9 +51,10 @@ fun FollowingScreen(navController: NavController, userId: Int, currentUserId: In
             )
         },
         content = { padding ->
-            Box(modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(padding)
             ) {
                 if (isLoading) {
                     LoadingIndicator()
@@ -62,28 +64,22 @@ fun FollowingScreen(navController: NavController, userId: Int, currentUserId: In
                     }
 
                     LazyColumn(
-                        modifier = Modifier.fillMaxSize().background(Color.LightGray)
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(Color.LightGray)
                     ) {
-                        if (currentUserId == userId) {
-                            item {
-                                Text(
-                                    "Sent Requests",
-                                    fontWeight = FontWeight.Bold,
-                                    modifier = Modifier.padding(16.dp)
-                                )
-                            }
-                            items(sentRequests) { friendshipSent ->
-                                UserItem(user = friendshipSent, isPending = true, onCancel = {
-                                    followingViewModel.cancelRequest(friendshipSent.receiverId)
-                                })
-                            }
+                        items(following) { user ->
+                            UserItem(user = user, onRemove = {
+                                followingViewModel.unfollowUser(user.id)
+                            })
                         }
                         item {
-                            Text("Friends", fontWeight = FontWeight.Bold, modifier = Modifier.padding(16.dp))
-                        }
-                        items(following) { user ->
-                            UserItem(user = user, isPending = false) {
-                                followingViewModel.removeFriend(user.id)
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Button(
+                                onClick = { followingViewModel.loadFollowing(userId, offset = following.size) },
+                                modifier = Modifier.fillMaxWidth().padding(16.dp)
+                            ) {
+                                Text("Load More")
                             }
                         }
                     }
@@ -94,7 +90,7 @@ fun FollowingScreen(navController: NavController, userId: Int, currentUserId: In
 }
 
 @Composable
-fun UserItem(user: UserItemDTO.FriendshipSent, isPending: Boolean, onCancel: (() -> Unit)? = null, onRemove: (() -> Unit)? = null) {
+fun UserItem(user: UserItemDTO.UserFriend, onRemove: (() -> Unit)? = null) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -112,14 +108,8 @@ fun UserItem(user: UserItemDTO.FriendshipSent, isPending: Boolean, onCancel: (()
                 Text(user.username, fontWeight = FontWeight.Bold)
                 Text(user.email, style = MaterialTheme.typography.body2)
             }
-            if (isPending) {
-                Button(onClick = onCancel!!) {
-                    Text("Cancel")
-                }
-            } else {
-                Button(onClick = onRemove!!) {
-                    Text("Remove")
-                }
+            IconButton(onClick = onRemove!!) {
+                Icon(Icons.Filled.Clear, contentDescription = "Remove")
             }
         }
     }

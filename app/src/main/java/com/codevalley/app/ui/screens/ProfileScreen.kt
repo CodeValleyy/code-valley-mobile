@@ -31,6 +31,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
 import com.codevalley.app.R
+import com.codevalley.app.model.FollowersAndFollowingsCount
 import com.codevalley.app.model.PostResponseDto
 import com.codevalley.app.store.FriendshipStore
 import com.codevalley.app.store.PostStore
@@ -42,17 +43,17 @@ import com.codevalley.app.ui.viewmodel.ProfileViewModel
 
 @Composable
 fun ProfileScreen(userId: Int, navController: NavController,
-                  profileViewModel: ProfileViewModel = hiltViewModel(),
-                  followersViewModel: FollowersViewModel = hiltViewModel(),
-                  followingViewModel: FollowingViewModel = hiltViewModel()) {
+                  profileViewModel: ProfileViewModel = hiltViewModel()) {
     val profileState by profileViewModel::profile
     val currentUser by profileViewModel::currentUser
     val isLoading by profileViewModel::isLoading
     val errorMessage by profileViewModel::errorMessage
     var imageUri by remember { mutableStateOf<Uri?>(null) }
     val numberOfPostsByUserId = PostStore.getNumberOfPostsByUserId(userId)
-    val numberOfFollowers by followersViewModel.numberOfFollowers.collectAsState()
-    val numberOfFollowing by followingViewModel.numberOfFollowing.collectAsState()
+    var numberOfFollowers by remember { mutableIntStateOf(0) }
+    var numberOfFollowing by remember { mutableIntStateOf(0) }
+    val countFollowersAndFollowing by FriendshipStore.followersAndFollowingsCount.collectAsState()
+
     val userPosts by remember { mutableStateOf(PostStore.getPostsByUserId(userId)) }
     val isFollowing by profileViewModel::isFollowing
 
@@ -67,17 +68,13 @@ fun ProfileScreen(userId: Int, navController: NavController,
 
     LaunchedEffect(Unit) {
         profileViewModel.loadProfile(userId)
+        profileViewModel.countFollowersAndFollowing(userId)
     }
 
-    LaunchedEffect(isLoading) {
-        if (!isLoading) {
-            if (currentUser?.id == userId) {
-                followersViewModel.loadFollowers()
-                followingViewModel.loadFollowing()
-            } else {
-                followersViewModel.loadFollowers(userId)
-                followingViewModel.loadFollowing(userId)
-            }
+    LaunchedEffect(countFollowersAndFollowing) {
+        countFollowersAndFollowing?.let {
+            numberOfFollowers = it.followers
+            numberOfFollowing = it.followings
         }
     }
 
