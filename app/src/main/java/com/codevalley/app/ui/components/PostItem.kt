@@ -25,6 +25,10 @@ import coil.compose.rememberAsyncImagePainter
 import com.codevalley.app.model.PostResponseDto
 import com.codevalley.app.ui.navigation.ScreenName
 import com.codevalley.app.ui.viewmodel.NewsFeedViewModel
+import com.wakaztahir.codeeditor.highlight.model.CodeLang
+import com.wakaztahir.codeeditor.highlight.prettify.PrettifyParser
+import com.wakaztahir.codeeditor.highlight.theme.CodeThemeType
+import com.wakaztahir.codeeditor.highlight.utils.parseCodeAsAnnotatedString
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -39,7 +43,6 @@ fun PostItem(
 ) {
     val dateFormat = remember { SimpleDateFormat("dd MMMM yyyy", Locale.getDefault()) }
     val userProfile = viewModel.userProfile
-
     var localPost by remember { mutableStateOf(post) }
 
     Card(
@@ -91,6 +94,37 @@ fun PostItem(
                 )
                 Spacer(modifier = Modifier.height(5.dp))
             }
+            Spacer(modifier = Modifier.height(8.dp))
+            if (!localPost.code.isNullOrEmpty()) {
+                val language = when (post.code_language?.lowercase(Locale.getDefault())) {
+                    "java" -> CodeLang.Java
+                    "python" -> CodeLang.Python
+                    "javascript" -> CodeLang.JavaScript
+                    "rust" -> CodeLang.Rust
+                    "lua" -> CodeLang.Lua
+                    else -> CodeLang.Python
+                }
+                val parser = remember { PrettifyParser() }
+                var themeState by remember { mutableStateOf(CodeThemeType.Default) }
+                val theme = remember(themeState) { themeState.theme() }
+
+                val parsedCode = remember {
+                    parseCodeAsAnnotatedString(
+                        parser = parser,
+                        theme = theme,
+                        lang = language,
+                        code = localPost.code!!
+                    )
+                }
+                Text(
+                    text = parsedCode,
+                    style = MaterialTheme.typography.body1,
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                Spacer(modifier = Modifier.height(5.dp))
+            }
+
             Row(verticalAlignment = Alignment.CenterVertically) {
                 IconButton(onClick = {
                     localPost = if (localPost.userHasLiked) {

@@ -15,6 +15,19 @@ data class LikePostResponseDto(
     val likes: Int
 )
 
+data class RawPostResponseDto(
+    val id: Int,
+    val content: String,
+    val userId: Int,
+    val fileId: String?,
+    val code_url: String?,
+    val username: String,
+    val createdAt: Date,
+    val avatar: String?,
+    val likes: Int,
+    val userHasLiked: Boolean,
+)
+
 data class PostResponseDto(
     val id: Int,
     val content: String,
@@ -23,7 +36,11 @@ data class PostResponseDto(
     val createdAt: Date,
     val avatar: String?,
     val likes: Int,
-    val userHasLiked: Boolean
+    val userHasLiked: Boolean,
+    val fileId: String?,
+    val code_url: String?,
+    val code: String?,
+    val code_language: String?,
 )
 
 data class Comment(

@@ -11,17 +11,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-
-import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.outlined.Email
-import androidx.compose.material.icons.outlined.Share
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -33,10 +27,6 @@ import com.codevalley.app.ui.components.LoadingIndicator
 import com.codevalley.app.ui.components.PostItem
 import com.codevalley.app.ui.navigation.ScreenName
 import com.codevalley.app.ui.viewmodel.NewsFeedViewModel
-import retrofit2.HttpException
-import java.text.SimpleDateFormat
-import java.util.*
-import kotlin.Exception
 
 @Composable
 fun NewsFeedScreen(navController: NavController, newsFeedViewModel: NewsFeedViewModel = hiltViewModel()) {
@@ -48,8 +38,8 @@ fun NewsFeedScreen(navController: NavController, newsFeedViewModel: NewsFeedView
     var searchQuery by remember { mutableStateOf("") }
     var postContent by remember { mutableStateOf("") }
     val imageUri by remember { mutableStateOf<Uri?>(null) }
-    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { _: Uri? ->
-       // imageUri = uri
+    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+        // imageUri = uri
     }
 
     LaunchedEffect(Unit) {

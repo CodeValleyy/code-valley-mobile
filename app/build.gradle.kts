@@ -63,6 +63,9 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.1")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.1")
 
+    // Compose code editor
+    implementation("com.github.qawaz:compose-code-editor:2.0.3")
+
     // Navigation Component
     implementation("androidx.navigation:navigation-fragment-ktx:2.7.7")
     implementation("androidx.navigation:navigation-ui-ktx:2.7.7")

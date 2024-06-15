@@ -3,5 +3,7 @@
     <domain-config cleartextTrafficPermitted="true">
         <domain includeSubdomains="true">10.0.2.2</domain>
         <domain includeSubdomains="true">176.134.7.134</domain>
+        <domain includeSubdomains="true">code-valley.xyz</domain>
+        <domain includeSubdomains="true">firebasestorage.googleapis.com</domain>
     </domain-config>
 </network-security-config>
