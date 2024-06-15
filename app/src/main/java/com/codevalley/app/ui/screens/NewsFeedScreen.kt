@@ -37,9 +37,9 @@ fun NewsFeedScreen(navController: NavController, newsFeedViewModel: NewsFeedView
     val userProfile = newsFeedViewModel.userProfile
     var searchQuery by remember { mutableStateOf("") }
     var postContent by remember { mutableStateOf("") }
-    val imageUri by remember { mutableStateOf<Uri?>(null) }
-    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
-        // imageUri = uri
+    var fileUri by remember { mutableStateOf<Uri?>(null) }
+    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
+        fileUri = uri
     }
 
     LaunchedEffect(Unit) {
@@ -102,11 +102,11 @@ fun NewsFeedScreen(navController: NavController, newsFeedViewModel: NewsFeedView
                     postContent = postContent,
                     onPostContentChange = { postContent = it },
                     onPostClick = {
-                        newsFeedViewModel.createPost(CreatePostDto(postContent))
+                        newsFeedViewModel.createPost(context, CreatePostDto(postContent), fileUri)
                         postContent = ""
                     },
-                    imageUri = imageUri,
-                    onPickImageClick = { launcher.launch("image/*") }
+                    fileUri = fileUri,
+                    onPickFileClick = { launcher.launch(arrayOf("*/*")) }
                 )
                 if (isLoading) {
                     LoadingIndicator()

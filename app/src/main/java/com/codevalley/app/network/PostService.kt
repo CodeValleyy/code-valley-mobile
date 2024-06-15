@@ -4,15 +4,20 @@ import com.codevalley.app.model.CreatePostDto
 import com.codevalley.app.model.LikePostResponseDto
 import com.codevalley.app.model.PostResponseDto
 import com.codevalley.app.model.RawPostResponseDto
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import retrofit2.http.*
 
 interface PostService {
     @GET("/posts")
     suspend fun getPosts(): List<RawPostResponseDto>
 
+    @Multipart
     @POST("/posts")
-    suspend fun createPost(@Body createPostDto: CreatePostDto): RawPostResponseDto
-
+    suspend fun createPost(
+        @Part("content") content: RequestBody,
+        @Part file: MultipartBody.Part?
+    ): RawPostResponseDto
     @DELETE("/posts/{id}")
     suspend fun deletePost(@Path("id") id: Int)
 

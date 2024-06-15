@@ -31,8 +31,8 @@ fun CreatePostSection(
     postContent: String,
     onPostContentChange: (String) -> Unit,
     onPostClick: () -> Unit,
-    imageUri: Uri?,
-    onPickImageClick: () -> Unit
+    fileUri: Uri?,
+    onPickFileClick: () -> Unit
 ) {
     Column(modifier = Modifier.padding(16.dp)) {
         Text(text = "Quoi de neuf ?!", style = MaterialTheme.typography.h6)
@@ -44,16 +44,14 @@ fun CreatePostSection(
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(modifier = Modifier.height(8.dp))
-        if (imageUri != null) {
-            Image(
-                painter = rememberAsyncImagePainter(imageUri),
-                contentDescription = null,
+        if (fileUri != null) {
+            Text(
+                text = "Fichier sélectionné : ${fileUri.lastPathSegment}",
+                style = MaterialTheme.typography.body2,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(150.dp)
-                    .clip(MaterialTheme.shapes.medium)
-                    .background(MaterialTheme.colors.onSurface.copy(alpha = 0.2f)),
-                contentScale = ContentScale.Crop
+                    .background(MaterialTheme.colors.onSurface.copy(alpha = 0.2f))
+                    .padding(8.dp)
             )
         }
         Spacer(modifier = Modifier.height(8.dp))
@@ -62,7 +60,7 @@ fun CreatePostSection(
             horizontalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier.fillMaxWidth()
         ) {
-            IconButton(onClick = onPickImageClick) {
+            IconButton(onClick = onPickFileClick) {
                 Icon(Icons.Default.Info, contentDescription = "Joindre un fichier")
             }
             Button(onClick = onPostClick) {

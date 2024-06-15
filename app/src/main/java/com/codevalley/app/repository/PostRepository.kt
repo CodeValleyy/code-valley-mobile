@@ -10,10 +10,12 @@ import com.codevalley.app.network.createAuthorizedApiService
 import com.codevalley.app.utils.PostUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import okhttp3.MultipartBody
 import retrofit2.Retrofit
 import javax.inject.Inject
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import okhttp3.RequestBody
 import java.io.IOException
 
 class PostRepository @Inject constructor(
@@ -78,8 +80,8 @@ class PostRepository @Inject constructor(
         }
     }
 
-    suspend fun createPost(createPostDto: CreatePostDto): RawPostResponseDto {
-        return postService.createPost(createPostDto)
+    suspend fun createPost(content: RequestBody, file: MultipartBody.Part?) {
+        postService.createPost(content, file)
     }
 
     suspend fun deletePost(id: Int) {
