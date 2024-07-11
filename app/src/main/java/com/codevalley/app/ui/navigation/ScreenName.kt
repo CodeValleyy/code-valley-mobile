@@ -9,10 +9,10 @@ enum class ScreenName(private val value: String) {
     Settings("settings"),
     PostDetail("postDetail"),
     Followers("followers"),
-    Following("following");
+    Following("following"),
+    Notification("notification");
 
     override fun toString(): String {
         return value
     }
-
 }

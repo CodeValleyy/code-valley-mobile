@@ -15,7 +15,8 @@ class GroupRepository @Inject constructor(
     private fun createAuthorizedApiService(): GroupService {
         return createAuthorizedApiService(retrofit, GroupService::class.java)
     }
-        suspend fun createGroup(groupDTO: GroupDTO): GroupResponseDTO {
+
+    suspend fun createGroup(groupDTO: GroupDTO): GroupResponseDTO {
         val groupService = createAuthorizedApiService()
         return groupService.createGroup(groupDTO)
     }

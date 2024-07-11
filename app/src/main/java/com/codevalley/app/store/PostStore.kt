@@ -12,6 +12,7 @@ object PostStore {
     fun setPosts(posts: List<PostResponseDto>) {
         _posts.value = posts
     }
+
     fun getPostById(postId: Int): PostResponseDto? {
         return _posts.value.firstOrNull { it.id == postId }
     }

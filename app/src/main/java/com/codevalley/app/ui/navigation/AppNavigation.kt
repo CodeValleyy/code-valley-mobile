@@ -11,6 +11,7 @@ import com.codevalley.app.ui.screens.PostDetailScreen
 import com.codevalley.app.ui.screens.LoginScreen
 import com.codevalley.app.ui.screens.MainScreen
 import com.codevalley.app.ui.screens.NewsFeedScreen
+import com.codevalley.app.ui.screens.NotificationScreen
 import com.codevalley.app.ui.screens.ProfileScreen
 import com.codevalley.app.ui.screens.RegisterScreen
 import com.codevalley.app.ui.screens.SettingsScreen
@@ -38,7 +39,11 @@ fun AppNavigation(navController: NavHostController = rememberNavController()) {
             SettingsScreen(navController)
         }
         composable(ScreenName.NewsFeed.toString()) {
-            NewsFeedScreen(navController)
+            // NewsFeedScreen(navController)
+            NotificationScreen(navController)
+        }
+        composable(ScreenName.Notification.toString()) {
+            NotificationScreen(navController)
         }
 
         composable("${ScreenName.PostDetail}/{post.id}") { backStackEntry ->

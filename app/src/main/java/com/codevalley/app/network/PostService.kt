@@ -1,8 +1,6 @@
 package com.codevalley.app.network
 
-import com.codevalley.app.model.CreatePostDto
 import com.codevalley.app.model.LikePostResponseDto
-import com.codevalley.app.model.PostResponseDto
 import com.codevalley.app.model.RawPostResponseDto
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
