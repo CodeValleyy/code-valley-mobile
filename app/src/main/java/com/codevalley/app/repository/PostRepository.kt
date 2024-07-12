@@ -34,40 +34,7 @@ class PostRepository @Inject constructor(
             }
 
             val postsWithCode: List<PostResponseDto> = posts.map { post ->
-                if (post.code_url != null) {
-                    val code = getCode(post.code_url)
-                    val code_language = PostUtils.getCodeLanguageFromUrl(post.code_url)
-
-                    PostResponseDto(
-                        id = post.id,
-                        content = post.content,
-                        userId = post.userId,
-                        username = post.username,
-                        createdAt = post.createdAt,
-                        avatar = post.avatar,
-                        likes = post.likes,
-                        userHasLiked = post.userHasLiked,
-                        fileId = post.fileId,
-                        code_url = post.code_url,
-                        code = code,
-                        code_language = code_language
-                    )
-                } else {
-                    PostResponseDto(
-                        id = post.id,
-                        content = post.content,
-                        userId = post.userId,
-                        username = post.username,
-                        createdAt = post.createdAt,
-                        avatar = post.avatar,
-                        likes = post.likes,
-                        userHasLiked = post.userHasLiked,
-                        fileId = post.fileId,
-                        code_url = post.code_url,
-                        code = null,
-                        code_language = null
-                    )
-                }
+                post.toPostResponseDto(client)
             }
 
             return postsWithCode.sortedByDescending { it.createdAt }
@@ -77,8 +44,9 @@ class PostRepository @Inject constructor(
         }
     }
 
-    suspend fun createPost(content: RequestBody, file: MultipartBody.Part?) {
-        postService.createPost(content, file)
+    suspend fun createPost(content: RequestBody, file: MultipartBody.Part?): PostResponseDto {
+        val rawPost: RawPostResponseDto = postService.createPost(content, file)
+        return rawPost.toPostResponseDto(client)
     }
 
     suspend fun deletePost(id: Int) {
@@ -93,14 +61,14 @@ class PostRepository @Inject constructor(
         return postService.unlikePost(id)
     }
 
-    suspend fun getCode(url: String): String {
+    suspend fun getCode(url: String, client: OkHttpClient): String {
         val request = Request.Builder()
             .url(url)
             .build()
 
         return withContext(Dispatchers.IO) {
             try {
-                val response = client.newCall(request).execute()
+                val response = this@PostRepository.client.newCall(request).execute()
                 if (!response.isSuccessful) throw IOException("Unexpected code $response")
 
                 response.body?.string() ?: throw IOException("Empty response body")
@@ -109,5 +77,25 @@ class PostRepository @Inject constructor(
                 throw e
             }
         }
+    }
+
+    suspend fun RawPostResponseDto.toPostResponseDto(client: OkHttpClient): PostResponseDto {
+        val code: String? = this.code_url?.let { getCode(it, client) }
+        val codeLanguage: String? = this.code_url?.let { PostUtils.getCodeLanguageFromUrl(it) }
+
+        return PostResponseDto(
+            id = this.id,
+            content = this.content,
+            userId = this.userId,
+            username = this.username,
+            createdAt = this.createdAt,
+            avatar = this.avatar,
+            likes = this.likes,
+            userHasLiked = this.userHasLiked,
+            fileId = this.fileId,
+            code_url = this.code_url,
+            code = code,
+            code_language = codeLanguage
+        )
     }
 }

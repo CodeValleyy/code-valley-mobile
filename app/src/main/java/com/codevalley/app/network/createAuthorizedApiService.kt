@@ -26,3 +26,25 @@ fun <T> createAuthorizedApiService(retrofit: Retrofit, service: Class<T>): T {
 
     return client.create(service)
 }
+
+fun <T> createAuthorizedApiServiceWithNullToken(retrofit: Retrofit, service: Class<T>): T {
+    val authInterceptor = okhttp3.Interceptor { chain ->
+        val token = TokenManager.token ?: ""
+        val original = chain.request()
+        val requestBuilder: Request.Builder = original.newBuilder()
+            .header("Authorization", "Bearer $token")
+        val request: Request = requestBuilder.build()
+        chain.proceed(request)
+    }
+
+    val client: Retrofit = retrofit.newBuilder()
+        .client(
+            OkHttpClient.Builder()
+                .addInterceptor(authInterceptor)
+                .build()
+        )
+        .build()
+
+    return client.create(service)
+}
+

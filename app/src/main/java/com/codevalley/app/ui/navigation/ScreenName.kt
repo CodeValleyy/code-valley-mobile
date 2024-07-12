@@ -10,6 +10,7 @@ enum class ScreenName(private val value: String) {
     PostDetail("postDetail"),
     Followers("followers"),
     Following("following"),
+    UserSearch("userSearch");
     Notification("notification");
 
     override fun toString(): String {

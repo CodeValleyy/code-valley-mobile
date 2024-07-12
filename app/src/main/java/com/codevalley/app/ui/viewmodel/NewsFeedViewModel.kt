@@ -147,7 +147,7 @@ class NewsFeedViewModel @Inject constructor(
                 }
 
                 val newPost = postRepository.createPost(contentBody, filePart)
-                PostStore.setPosts((listOf(newPost) + PostStore.posts.value) as List<PostResponseDto>)
+                PostStore.setPosts((listOf(newPost) + PostStore.posts.value))
             } catch (e: Exception) {
                 e.printStackTrace()
                 _errorMessage.value = "Failed to create post."
