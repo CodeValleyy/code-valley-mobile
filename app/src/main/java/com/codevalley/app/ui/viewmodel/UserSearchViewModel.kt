@@ -27,6 +27,12 @@ class UserSearchViewModel @Inject constructor(
     fun searchUsers(username: String) {
         viewModelScope.launch {
             _isLoading.value = true
+
+            if (username.isEmpty()) {
+                _errorMessage.value = "Please enter a username."
+                _isLoading.value = false
+                return@launch
+            }
             try {
                 val result = authService.searchUsers(username)
                 _users.value = result
