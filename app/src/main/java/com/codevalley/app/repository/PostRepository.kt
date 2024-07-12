@@ -29,11 +29,10 @@ class PostRepository @Inject constructor(
         createAuthorizedApiService(retrofit, PostService::class.java)
     }
 
-    suspend fun fetchPosts(): List<PostResponseDto> {
-
+    suspend fun fetchPosts(limit: Int, offset: Int): List<PostResponseDto> {
         try {
             val posts = withContext(Dispatchers.IO) {
-                postService.getPosts()
+                postService.getPosts(limit, offset)
             }
 
             val postsWithCode: List<PostResponseDto> = posts.map { post ->

@@ -10,7 +10,10 @@ import retrofit2.http.*
 
 interface PostService {
     @GET("/posts")
-    suspend fun getPosts(): List<RawPostResponseDto>
+    suspend fun getPosts(
+        @Query("limit") limit: Int,
+        @Query("offset") offset: Int
+    ): List<RawPostResponseDto>
 
     @Multipart
     @POST("/posts")

@@ -40,6 +40,7 @@ import com.codevalley.app.ui.navigation.ScreenName
 import com.codevalley.app.ui.viewmodel.FollowersViewModel
 import com.codevalley.app.ui.viewmodel.FollowingViewModel
 import com.codevalley.app.ui.viewmodel.ProfileViewModel
+import com.codevalley.app.utils.Constants
 
 @Composable
 fun ProfileScreen(userId: Int, navController: NavController,
@@ -141,11 +142,8 @@ fun ProfileScreen(userId: Int, navController: NavController,
                             .fillMaxSize()
                             .padding(16.dp)
                     ) {
-                        val painter = when {
-                            imageUri != null -> rememberAsyncImagePainter(imageUri)
-                            profile.avatar?.isNotEmpty() == true -> rememberAsyncImagePainter(profile.avatar)
-                            else -> painterResource(id = R.drawable.image)
-                        }
+                        val avatarUrl = profile.avatar ?: Constants.DEFAULT_AVATAR_URL
+                        val painter =rememberAsyncImagePainter(avatarUrl)
 
                         Image(
                             painter = painter,

@@ -22,15 +22,17 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.codevalley.app.model.CreatePostDto
+import com.codevalley.app.store.PostStore
 import com.codevalley.app.ui.components.CreatePostSection
 import com.codevalley.app.ui.components.LoadingIndicator
 import com.codevalley.app.ui.components.PostItem
 import com.codevalley.app.ui.navigation.ScreenName
 import com.codevalley.app.ui.viewmodel.NewsFeedViewModel
+import com.codevalley.app.utils.Constants
 
 @Composable
 fun NewsFeedScreen(navController: NavController, newsFeedViewModel: NewsFeedViewModel = hiltViewModel()) {
-    val posts by newsFeedViewModel.posts.collectAsState()
+    val posts by PostStore.posts.collectAsState()
     val errorMessage by newsFeedViewModel.errorMessage.collectAsState()
     val isLoading by newsFeedViewModel.isLoading.collectAsState()
     val context = LocalContext.current
@@ -43,8 +45,9 @@ fun NewsFeedScreen(navController: NavController, newsFeedViewModel: NewsFeedView
     }
 
     LaunchedEffect(Unit) {
-        newsFeedViewModel.loadPosts()
+        newsFeedViewModel.loadMorePosts()
     }
+
 
     Scaffold(
         topBar = {
@@ -84,8 +87,9 @@ fun NewsFeedScreen(navController: NavController, newsFeedViewModel: NewsFeedView
                         IconButton(onClick = {
                             navController.navigate("${ScreenName.Profile}/${userProfile.id}")
                         }) {
+                            val avatarUrl = userProfile.avatar ?: Constants.DEFAULT_AVATAR_URL
                             Image(
-                                painter = rememberAsyncImagePainter(userProfile.avatar),
+                                painter = rememberAsyncImagePainter(avatarUrl),
                                 contentDescription = "User Avatar",
                                 modifier = Modifier
                                     .size(40.dp)
@@ -108,7 +112,7 @@ fun NewsFeedScreen(navController: NavController, newsFeedViewModel: NewsFeedView
                     fileUri = fileUri,
                     onPickFileClick = { launcher.launch(arrayOf("*/*")) }
                 )
-                if (isLoading) {
+                if (isLoading && posts.isEmpty()) {
                     LoadingIndicator()
                 } else {
                     if (errorMessage.isNotEmpty()) {
@@ -125,6 +129,15 @@ fun NewsFeedScreen(navController: NavController, newsFeedViewModel: NewsFeedView
                                 navController = navController,
                                 viewModel = newsFeedViewModel
                             )
+                        }
+                        item {
+                            if (isLoading) {
+                                LoadingIndicator()
+                            } else {
+                                SideEffect {
+                                    newsFeedViewModel.loadMorePosts()
+                                }
+                            }
                         }
                     }
                 }

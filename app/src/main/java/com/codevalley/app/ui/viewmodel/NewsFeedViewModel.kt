@@ -40,40 +40,57 @@ class NewsFeedViewModel @Inject constructor(
 
     val posts: StateFlow<List<PostResponseDto>> = PostStore.posts
 
+    private var currentOffset = 0
+    private val pageSize = 2
+
     val userProfile: UserResponseDTO?
         get() = UserStore.userProfile
 
-    fun loadPosts() {
+    fun loadMorePosts() {
         viewModelScope.launch {
             _isLoading.value = true
             try {
-                val posts = postRepository.fetchPosts()
-                PostStore.setPosts(posts)
-                _isLoading.value = false
+                val newPosts = postRepository.fetchPosts(pageSize, currentOffset)
+                currentOffset += newPosts.size
+                PostStore.setPosts((PostStore.posts.value + newPosts))
             } catch (e: Exception) {
                 _errorMessage.value = "Failed to load posts."
+            } finally {
+                _isLoading.value = false
             }
         }
     }
+
 
     fun likePost(postId: Int) {
         viewModelScope.launch {
             try {
+                updatePostLocal(postId) { post ->
+                    post.copy(userHasLiked = true, likes = post.likes + 1)
+                }
                 postRepository.likePost(postId)
-                loadPosts()
             } catch (e: Exception) {
                 _errorMessage.value = "Failed to like post."
+                updatePostLocal(postId) { post ->
+                    post.copy(userHasLiked = false, likes = post.likes - 1)
+                }
             }
         }
     }
 
+
     fun unlikePost(postId: Int) {
         viewModelScope.launch {
             try {
+                updatePostLocal(postId) { post ->
+                    post.copy(userHasLiked = false, likes = post.likes - 1)
+                }
                 postRepository.unlikePost(postId)
-                loadPosts()
             } catch (e: Exception) {
                 _errorMessage.value = "Failed to unlike post."
+                updatePostLocal(postId) { post ->
+                    post.copy(userHasLiked = true, likes = post.likes + 1)
+                }
             }
         }
     }
@@ -130,8 +147,8 @@ class NewsFeedViewModel @Inject constructor(
                     MultipartBody.Part.createFormData("file", file.name, requestBody)
                 }
 
-                postRepository.createPost(contentBody, filePart)
-                loadPosts()
+                val newPost = postRepository.createPost(contentBody, filePart)
+                PostStore.setPosts((listOf(newPost) + PostStore.posts.value) as List<PostResponseDto>)
             } catch (e: Exception) {
                 e.printStackTrace()
                 _errorMessage.value = "Failed to create post."
@@ -143,7 +160,7 @@ class NewsFeedViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 postRepository.deletePost(id)
-                loadPosts()
+                PostStore.setPosts(PostStore.posts.value.filter { it.id != id })
             } catch (e: Exception) {
                 _errorMessage.value = "Failed to delete post."
             }
