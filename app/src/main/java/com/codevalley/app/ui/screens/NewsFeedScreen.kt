@@ -11,6 +11,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -48,41 +50,17 @@ fun NewsFeedScreen(navController: NavController, newsFeedViewModel: NewsFeedView
         newsFeedViewModel.loadMorePosts()
     }
 
-
     Scaffold(
         topBar = {
             TopAppBar(
-                title = {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(36.dp)
-                            .background(MaterialTheme.colors.surface, CircleShape)
-                            .padding(horizontal = 8.dp, vertical = 4.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        TextField(
-                            value = searchQuery,
-                            onValueChange = { searchQuery = it },
-                            placeholder = { Text("Search") },
-                            singleLine = true,
-                            colors = TextFieldDefaults.textFieldColors(
-                                textColor = MaterialTheme.colors.onSurface,
-                                backgroundColor = Color.Transparent,
-                                cursorColor = LocalContentColor.current.copy(alpha = LocalContentAlpha.current),
-                                focusedIndicatorColor = Color.Transparent,
-                                unfocusedIndicatorColor = Color.Transparent,
-                                disabledIndicatorColor = Color.Transparent
-                            ),
-                            modifier = Modifier.fillMaxWidth(),
-                            textStyle = LocalTextStyle.current.copy(fontSize = MaterialTheme.typography.body2.fontSize)
-                        )
-                    }
-                },
+                title = { Text("News Feed") },
                 backgroundColor = MaterialTheme.colors.primary,
                 contentColor = Color.White,
                 modifier = Modifier.height(56.dp),
                 actions = {
+                    IconButton(onClick = { navController.navigate("userSearch") }) {
+                        Icon(Icons.Default.Search, contentDescription = "Search Users")
+                    }
                     if (userProfile != null) {
                         IconButton(onClick = {
                             navController.navigate("${ScreenName.Profile}/${userProfile.id}")

@@ -47,6 +47,9 @@ interface AuthService {
     @POST("/auth/register")
     suspend fun register(@Body registerRequest: RegisterRequestDTO): TokenResponse
 
+    @GET("/auth/search/{username}")
+    suspend fun searchUsers(@Path("username") username: String): List<UserResponseDTO>
+
     @POST("/auth/logout")
     suspend fun logout()
 }
