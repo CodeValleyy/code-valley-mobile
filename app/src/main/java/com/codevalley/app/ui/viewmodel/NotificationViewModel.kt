@@ -1,6 +1,5 @@
 package com.codevalley.app.ui.viewmodel
 
-import android.app.Notification
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -11,10 +10,8 @@ import com.codevalley.app.model.NotificationType
 import com.codevalley.app.model.UserResponseDTO
 import com.codevalley.app.repository.NotificationRepository
 import com.codevalley.app.store.NotificationStore
-import com.codevalley.app.store.PostStore
 import com.codevalley.app.store.UserStore
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date

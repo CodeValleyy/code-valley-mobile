@@ -10,7 +10,6 @@ import com.codevalley.app.ui.screens.FollowingScreen
 import com.codevalley.app.ui.screens.PostDetailScreen
 import com.codevalley.app.ui.screens.LoginScreen
 import com.codevalley.app.ui.screens.MainScreen
-import com.codevalley.app.ui.screens.NewsFeedScreen
 import com.codevalley.app.ui.screens.NotificationScreen
 import com.codevalley.app.ui.screens.ProfileScreen
 import com.codevalley.app.ui.screens.RegisterScreen

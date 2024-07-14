@@ -2,7 +2,6 @@ package com.codevalley.app.repository
 
 import com.codevalley.app.model.GroupResponseDTO
 import com.codevalley.app.model.GroupDTO
-import com.codevalley.app.network.AuthService
 import com.codevalley.app.network.GroupService
 import com.codevalley.app.network.createAuthorizedApiService
 import retrofit2.Retrofit

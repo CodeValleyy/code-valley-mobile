@@ -21,7 +21,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -30,15 +29,11 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
-import com.codevalley.app.R
-import com.codevalley.app.model.FollowersAndFollowingsCount
 import com.codevalley.app.model.PostResponseDto
 import com.codevalley.app.store.FriendshipStore
 import com.codevalley.app.store.PostStore
 import com.codevalley.app.ui.components.LoadingIndicator
 import com.codevalley.app.ui.navigation.ScreenName
-import com.codevalley.app.ui.viewmodel.FollowersViewModel
-import com.codevalley.app.ui.viewmodel.FollowingViewModel
 import com.codevalley.app.ui.viewmodel.ProfileViewModel
 import com.codevalley.app.utils.Constants
 

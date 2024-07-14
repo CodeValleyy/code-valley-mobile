@@ -49,7 +49,7 @@ class NewsFeedViewModel @Inject constructor(
         viewModelScope.launch {
             _isLoading.value = true
             try {
-                val posts = postRepository.fetchPosts(1000, 0)
+                val posts = postRepository.fetchPosts(1000, currentOffset)
                 PostStore.setPosts(posts)
             } catch (e: Exception) {
                 _errorMessage.value = "Failed to load posts."
