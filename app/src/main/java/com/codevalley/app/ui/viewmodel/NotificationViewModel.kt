@@ -1,10 +1,13 @@
 package com.codevalley.app.ui.viewmodel
 
+import android.app.Notification
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.codevalley.app.model.NotificationDto
+import com.codevalley.app.model.NotificationType
 import com.codevalley.app.model.UserResponseDTO
 import com.codevalley.app.repository.NotificationRepository
 import com.codevalley.app.store.NotificationStore
@@ -13,6 +16,9 @@ import com.codevalley.app.store.UserStore
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import javax.inject.Inject
 
 @HiltViewModel
@@ -55,7 +61,11 @@ class NotificationViewModel @Inject constructor(
         }
     }
 
-    fun seeNotification(notificationId: Int) {
+    fun seeNotification(notificationId: Int)
+    {
+        if (NotificationStore.getHasBeenRead(notificationId)) {
+            return
+        }
         viewModelScope.launch {
             NotificationStore.seeNotification(notificationId)
             try {
@@ -69,7 +79,11 @@ class NotificationViewModel @Inject constructor(
         }
     }
 
-    fun unseeNotification(notificationId: Int) {
+    fun unseeNotification(notificationId: Int)
+    {
+        if (!NotificationStore.getHasBeenRead(notificationId)) {
+            return
+        }
         viewModelScope.launch {
             NotificationStore.unseeNotification(notificationId)
             try {
@@ -95,5 +109,19 @@ class NotificationViewModel @Inject constructor(
                 errorMessage = "Failed to delete notification."
             }
         }
+    }
+
+    fun formatMessage(notification: NotificationDto): String {
+        return when (notification.notificationType) {
+            NotificationType.friendshipReceived -> "${notification.fromUsername} sent you a friend request!"
+            NotificationType.friendshipAccepted -> "${notification.fromUsername} accepted your friend request!"
+            NotificationType.friendshipRefused -> "${notification.fromUsername} refused your friend request..."
+            NotificationType.post -> "Check the new post of ${notification.fromUsername} !"
+            NotificationType.like -> "${notification.fromUsername} liked your post!"
+        }
+    }
+
+    fun formatDate(date: Date): String {
+        return SimpleDateFormat("dd MMMM yyyy", Locale.getDefault()).format(date)
     }
 }

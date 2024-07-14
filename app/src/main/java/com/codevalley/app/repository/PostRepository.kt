@@ -3,6 +3,7 @@ package com.codevalley.app.repository
 import android.content.Context
 import com.codevalley.app.model.LikePostResponseDto
 import com.codevalley.app.model.PostResponseDto
+import com.codevalley.app.model.RawPostResponseDto
 import com.codevalley.app.network.PostService
 import com.codevalley.app.network.createAuthorizedApiService
 import com.codevalley.app.utils.PostUtils

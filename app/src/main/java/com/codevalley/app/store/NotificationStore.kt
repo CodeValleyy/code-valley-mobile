@@ -47,6 +47,10 @@ object NotificationStore {
         }
     }
 
+    fun getHasBeenRead(notificationId: Int): Boolean {
+        return _notifications.value.find { it.id == notificationId }?.hasBeenRead ?: false
+    }
+
     fun deleteNotification(notificationId: Int) {
         _notifications.value = _notifications.value.filter { it.id != notificationId }
     }
