@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.codevalley.app.model.UserResponseDTO
 import com.codevalley.app.repository.FriendshipRepository
 import com.codevalley.app.repository.UserRepository
+import com.codevalley.app.store.UserStore
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -20,17 +21,19 @@ class ProfileViewModel @Inject constructor(
 ) : ViewModel() {
 
     var profile by mutableStateOf<UserResponseDTO?>(null)
-    var currentUser by mutableStateOf<UserResponseDTO?>(null)
     var errorMessage by mutableStateOf<String?>(null)
     var isLoading by mutableStateOf(true)
     var isFollowing by mutableStateOf(false)
+    var currentUser = UserStore.currentUser
 
     fun loadProfile(id: Int) {
         viewModelScope.launch {
             try {
                 profile = userRepository.getProfile(id)
-                currentUser = userRepository.getMe()
-                isFollowing = friendshipRepository.isFollowing(currentUser!!.id, id)
+                val currentUserId = currentUser.value?.id
+                if (currentUserId != null) {
+                    isFollowing = friendshipRepository.isFollowing(currentUserId, id)
+                }
                 isLoading = false
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -39,7 +42,6 @@ class ProfileViewModel @Inject constructor(
             }
         }
     }
-
 
     fun followUser(userId: Int) {
         viewModelScope.launch {
@@ -85,6 +87,5 @@ class ProfileViewModel @Inject constructor(
                 errorMessage = "Failed to count followers and following."
             }
         }
-
     }
 }

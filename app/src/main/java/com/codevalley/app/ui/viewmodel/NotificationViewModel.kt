@@ -23,9 +23,6 @@ class NotificationViewModel @Inject constructor(
     private val notificationRepository: NotificationRepository
 ) : ViewModel() {
 
-    val userProfile: UserResponseDTO?
-        get() = UserStore.userProfile
-
     val notifications = NotificationStore.notifications
     val unreadNotificationsCount = NotificationStore.unreadNotificationsCount
     var isLoading by mutableStateOf(false)

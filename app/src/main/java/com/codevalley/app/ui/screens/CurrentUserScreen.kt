@@ -23,13 +23,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
-import com.codevalley.app.model.PostResponseDto
 import com.codevalley.app.store.FriendshipStore
 import com.codevalley.app.store.PostStore
 import com.codevalley.app.ui.components.LoadingIndicator
@@ -38,19 +35,17 @@ import com.codevalley.app.ui.viewmodel.ProfileViewModel
 import com.codevalley.app.utils.Constants
 
 @Composable
-fun ProfileScreen(userId: Int, navController: NavController,
-                  profileViewModel: ProfileViewModel = hiltViewModel()) {
-    val profileState by profileViewModel::profile
+fun CurrentUserScreen(navController: NavController, profileViewModel: ProfileViewModel = hiltViewModel()) {
     val currentUser by profileViewModel.currentUser.collectAsState()
     val isLoading by profileViewModel::isLoading
     val errorMessage by profileViewModel::errorMessage
     var imageUri by remember { mutableStateOf<Uri?>(null) }
-    val numberOfPostsByUserId = PostStore.getNumberOfPostsByUserId(userId)
+    val numberOfPostsByUserId = PostStore.getNumberOfPostsByUserId(currentUser!!.id)
     var numberOfFollowers by remember { mutableIntStateOf(0) }
     var numberOfFollowing by remember { mutableIntStateOf(0) }
     val countFollowersAndFollowing by FriendshipStore.followersAndFollowingsCount.collectAsState()
 
-    val userPosts by remember { mutableStateOf(PostStore.getPostsByUserId(userId)) }
+    val userPosts by remember { mutableStateOf(PostStore.getPostsByUserId(currentUser!!.id)) }
     val isFollowing by profileViewModel::isFollowing
 
     val imagePickerLauncher = rememberLauncherForActivityResult(
@@ -58,13 +53,13 @@ fun ProfileScreen(userId: Int, navController: NavController,
     ) { uri: Uri? ->
         uri?.let {
             imageUri = it
-            profileViewModel.uploadAvatar(userId, it)
+            profileViewModel.uploadAvatar(currentUser!!.id, it)
         }
     }
 
     LaunchedEffect(Unit) {
-        profileViewModel.loadProfile(userId)
-        profileViewModel.countFollowersAndFollowing(userId)
+        profileViewModel.loadProfile(currentUser!!.id)
+        profileViewModel.countFollowersAndFollowing(currentUser!!.id)
     }
 
     LaunchedEffect(countFollowersAndFollowing) {
@@ -119,15 +114,13 @@ fun ProfileScreen(userId: Int, navController: NavController,
                     Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                 }
 
-                if (currentUser?.id == userId) {
-                    IconButton(
-                        onClick = { navController.navigate(ScreenName.Settings.toString()) },
-                        modifier = Modifier
-                            .align(Alignment.TopEnd)
-                            .padding(16.dp)
-                    ) {
-                        Icon(imageVector = Icons.Default.Settings, contentDescription = "Settings")
-                    }
+                IconButton(
+                    onClick = { navController.navigate(ScreenName.Settings.toString()) },
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(16.dp)
+                ) {
+                    Icon(imageVector = Icons.Default.Settings, contentDescription = "Settings")
                 }
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
@@ -136,10 +129,10 @@ fun ProfileScreen(userId: Int, navController: NavController,
                         .fillMaxSize()
                         .padding(16.dp)
                 ) {
-                    val avatarUrl = if (profileState?.avatar.isNullOrEmpty()) {
+                    val avatarUrl = if (currentUser?.avatar.isNullOrEmpty()) {
                         Constants.DEFAULT_AVATAR_URL
                     } else {
-                        profileState?.avatar!!
+                        "${currentUser?.username}"
                     }
                     val painter = rememberAsyncImagePainter(avatarUrl)
 
@@ -150,42 +143,38 @@ fun ProfileScreen(userId: Int, navController: NavController,
                             .size(100.dp)
                             .clip(CircleShape)
                             .background(MaterialTheme.colors.surface)
-                            .clickable(enabled = currentUser?.id == userId) {
-                                imagePickerLauncher.launch("image/*")
-                            },
+                            .clickable { imagePickerLauncher.launch("image/*") },
                         contentScale = ContentScale.Crop
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
-                        text = "${profileState?.username}",
+                        text = "${currentUser?.username}",
                         style = MaterialTheme.typography.h4.copy(fontWeight = FontWeight.Bold),
                         textAlign = TextAlign.Center
                     )
                     Text(
-                        text = "@${profileState?.username}",
+                        text = "@${currentUser?.username}",
                         style = MaterialTheme.typography.body1,
                         color = Color.Gray,
                         textAlign = TextAlign.Center
                     )
                     Spacer(modifier = Modifier.height(32.dp))
-                    if (currentUser?.id != userId) {
-                        LazyColumn(
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            item {
-                                Row(
-                                    horizontalArrangement = Arrangement.SpaceEvenly,
-                                    modifier = Modifier.fillMaxWidth()
-                                ) {
-                                    Button(onClick = {
-                                        if (isFollowing) {
-                                            profileViewModel.unfollowUser(userId)
-                                        } else {
-                                            profileViewModel.followUser(userId)
-                                        }
-                                    }) {
-                                        Text(text = if (isFollowing) "Unfollow" else "Follow")
+                    LazyColumn(
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        item {
+                            Row(
+                                horizontalArrangement = Arrangement.SpaceEvenly,
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Button(onClick = {
+                                    if (isFollowing) {
+                                        profileViewModel.unfollowUser(currentUser!!.id)
+                                    } else {
+                                        profileViewModel.followUser(currentUser!!.id)
                                     }
+                                }) {
+                                    Text(text = if (isFollowing) "Unfollow" else "Follow")
                                 }
                             }
                         }
@@ -196,7 +185,7 @@ fun ProfileScreen(userId: Int, navController: NavController,
                         horizontalArrangement = Arrangement.SpaceEvenly
                     ) {
                         ProfileStat(label = "Followers", value = numberOfFollowers.toString(), onClick = {
-                            navController.navigate(ScreenName.Followers.toString() + "/${profileState?.id}/${currentUser?.id}") {
+                            navController.navigate(ScreenName.Followers.toString() + "/${currentUser?.id}/${currentUser?.id}") {
                                 popUpTo(ScreenName.Profile.toString()) { inclusive = true }
                             }
                         })
@@ -204,7 +193,7 @@ fun ProfileScreen(userId: Int, navController: NavController,
                             /* TODO: Handle click */
                         })
                         ProfileStat(label = "Following", value = numberOfFollowing.toString(), onClick = {
-                            navController.navigate(ScreenName.Following.toString() + "/${profileState?.id}/${currentUser?.id}") {
+                            navController.navigate(ScreenName.Following.toString() + "/${currentUser?.id}/${currentUser?.id}") {
                                 popUpTo(ScreenName.Profile.toString()) { inclusive = true }
                             }
                         })
@@ -224,62 +213,4 @@ fun ProfileScreen(userId: Int, navController: NavController,
             }
         }
     }
-}
-
-@Composable
-fun ProfileStat(label: String, value: String, onClick: () -> Unit) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.clickable { onClick() }
-    ) {
-        Text(
-            text = value,
-            style = MaterialTheme.typography.h6,
-            fontWeight = FontWeight.Bold
-        )
-        Text(
-            text = label,
-            style = MaterialTheme.typography.body2,
-            color = Color.Gray
-        )
-    }
-}
-
-@Composable
-fun PostItem(post: PostResponseDto, onClick: () -> Unit) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp)
-            .clickable { onClick() },
-        elevation = 4.dp
-    ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Text(text = post.username, fontWeight = FontWeight.Bold)
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(text = post.content)
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(text = "Likes: ${post.likes}", style = MaterialTheme.typography.body2)
-        }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun ProfileScreenPreview() {
-    val navController = rememberNavController()
-    ProfileScreen(
-        userId = 1,
-        navController = navController
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun ProfileStatPreview() {
-    ProfileStat(
-        label = "Followers",
-        value = "6.3k",
-        onClick = { /* TODO: Handle click */ }
-    )
 }

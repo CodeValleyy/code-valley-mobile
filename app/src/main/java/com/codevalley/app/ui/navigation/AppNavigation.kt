@@ -5,11 +5,13 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.codevalley.app.ui.screens.CurrentUserScreen
 import com.codevalley.app.ui.screens.FollowersScreen
 import com.codevalley.app.ui.screens.FollowingScreen
 import com.codevalley.app.ui.screens.PostDetailScreen
 import com.codevalley.app.ui.screens.LoginScreen
 import com.codevalley.app.ui.screens.MainScreen
+import com.codevalley.app.ui.screens.NewsFeedScreen
 import com.codevalley.app.ui.screens.NotificationScreen
 import com.codevalley.app.ui.screens.ProfileScreen
 import com.codevalley.app.ui.screens.RegisterScreen
@@ -35,17 +37,18 @@ fun AppNavigation(navController: NavHostController = rememberNavController()) {
                 navController = navController,
             )
         }
+        composable(ScreenName.CurrentUser.toString()) {
+            CurrentUserScreen(navController)
+        }
         composable(ScreenName.Settings.toString()) {
             SettingsScreen(navController)
         }
         composable(ScreenName.NewsFeed.toString()) {
-            // NewsFeedScreen(navController)
-            NotificationScreen(navController)
+            NewsFeedScreen(navController)
         }
         composable(ScreenName.Notification.toString()) {
             NotificationScreen(navController)
         }
-
         composable(ScreenName.UserSearch.toString()) {
             UserSearchScreen(navController)
         }

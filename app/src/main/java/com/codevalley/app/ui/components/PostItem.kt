@@ -23,8 +23,10 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.codevalley.app.model.PostResponseDto
+import com.codevalley.app.store.UserStore
 import com.codevalley.app.ui.navigation.ScreenName
 import com.codevalley.app.ui.viewmodel.NewsFeedViewModel
+import com.codevalley.app.utils.Constants
 import com.wakaztahir.codeeditor.highlight.model.CodeLang
 import com.wakaztahir.codeeditor.highlight.prettify.PrettifyParser
 import com.wakaztahir.codeeditor.highlight.theme.CodeThemeType
@@ -42,7 +44,7 @@ fun PostItem(
     isDetailScreen: Boolean = false
 ) {
     val dateFormat = remember { SimpleDateFormat("dd MMMM yyyy", Locale.getDefault()) }
-    val userProfile = viewModel.userProfile
+    val userProfile = UserStore.getUserProfile()
     var localPost by remember { mutableStateOf(post) }
 
     Card(
@@ -58,7 +60,7 @@ fun PostItem(
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Image(
-                    painter = rememberAsyncImagePainter(post.avatar ?: ""),
+                    painter = rememberAsyncImagePainter(post.avatar ?: Constants.DEFAULT_AVATAR_URL),
                     contentDescription = null,
                     modifier = Modifier
                         .size(48.dp)

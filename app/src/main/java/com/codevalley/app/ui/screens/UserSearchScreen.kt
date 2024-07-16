@@ -21,6 +21,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.codevalley.app.model.UserResponseDTO
+import com.codevalley.app.ui.components.AvatarComponent
 import com.codevalley.app.ui.navigation.ScreenName
 import com.codevalley.app.ui.viewmodel.UserSearchViewModel
 
@@ -64,17 +65,23 @@ fun UserSearchScreen(navController: NavController, userSearchViewModel: UserSear
             )
         },
         content = { padding ->
-            Column(modifier = Modifier.fillMaxSize().padding(padding)) {
+            Column(modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)) {
                 TextField(
                     value = searchQuery,
                     onValueChange = { searchQuery = it },
                     placeholder = { Text("Search users...") },
                     singleLine = true,
-                    modifier = Modifier.fillMaxWidth().padding(16.dp)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
                 )
                 Button(
                     onClick = { userSearchViewModel.searchUsers(searchQuery) },
-                    modifier = Modifier.align(Alignment.End).padding(16.dp)
+                    modifier = Modifier
+                        .align(Alignment.End)
+                        .padding(16.dp)
                 ) {
                     Text("Search")
                 }
@@ -104,14 +111,7 @@ fun UserItem(user: UserResponseDTO, navController: NavController) {
             .clickable { navController.navigate("${ScreenName.Profile}/${user.id}") },
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Image(
-            painter = rememberAsyncImagePainter(user.avatar ?: ""),
-            contentDescription = "User Avatar",
-            modifier = Modifier
-                .size(40.dp)
-                .clip(CircleShape)
-                .background(Color.Gray)
-        )
+        AvatarComponent(navController, user)
         Spacer(modifier = Modifier.width(16.dp))
         Column {
             Text(user.username, fontWeight = FontWeight.Bold)

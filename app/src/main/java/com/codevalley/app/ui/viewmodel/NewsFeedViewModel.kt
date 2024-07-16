@@ -10,6 +10,7 @@ import com.codevalley.app.model.PostResponseDto
 import com.codevalley.app.model.UserResponseDTO
 import com.codevalley.app.repository.FriendshipRepository
 import com.codevalley.app.repository.PostRepository
+import com.codevalley.app.repository.UserRepository
 import com.codevalley.app.store.PostStore
 import com.codevalley.app.store.UserStore
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -41,9 +42,6 @@ class NewsFeedViewModel @Inject constructor(
 
     private var currentOffset = 0
     private val pageSize = 2
-
-    val userProfile: UserResponseDTO?
-        get() = UserStore.userProfile
 
     fun loadMorePosts() {
         viewModelScope.launch {

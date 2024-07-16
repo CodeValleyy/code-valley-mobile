@@ -14,7 +14,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.codevalley.app.model.Comment
 import com.codevalley.app.store.PostStore
-import com.codevalley.app.store.UserStore.userProfile
+import com.codevalley.app.store.UserStore
 import com.codevalley.app.ui.components.CommentInputSection
 import com.codevalley.app.ui.components.CommentItem
 import com.codevalley.app.ui.components.LoadingIndicator
@@ -27,6 +27,7 @@ fun PostDetailScreen(postId: Int, navController: NavController, newsFeedViewMode
     val post = PostStore.getPostById(postId)
     var commentText by remember { mutableStateOf("") }
     var comments by remember { mutableStateOf(listOf<Comment>()) }
+    val currentUser = UserStore.getUserProfile()
 
     if (post == null) {
         LoadingIndicator()
@@ -77,9 +78,9 @@ fun PostDetailScreen(postId: Int, navController: NavController, newsFeedViewMode
                         val newComment = Comment(
                             id = comments.size + 1,
                             avatar = post.avatar ?: "",
-                            username = userProfile?.username ?: "Anonymous",
+                            username = currentUser?.username ?: "Anonymous",
                             content = commentText,
-                            userId = userProfile?.id ?: 0,
+                            userId = currentUser?.id ?: 0,
                             createdAt = Date(),
                             hasLiked = false,
                         )
