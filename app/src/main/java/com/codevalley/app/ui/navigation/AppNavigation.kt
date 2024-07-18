@@ -10,6 +10,7 @@ import com.codevalley.app.ui.screens.FollowersScreen
 import com.codevalley.app.ui.screens.FollowingScreen
 import com.codevalley.app.ui.screens.GroupMembersScreen
 import com.codevalley.app.ui.screens.GroupsScreen
+import com.codevalley.app.ui.screens.JoinRequestsScreen
 import com.codevalley.app.ui.screens.PostDetailScreen
 import com.codevalley.app.ui.screens.LoginScreen
 import com.codevalley.app.ui.screens.MainScreen
@@ -69,16 +70,16 @@ fun AppNavigation(navController: NavHostController = rememberNavController()) {
             val groupId = backStackEntry.arguments?.getString("groupId")?.toInt() ?: 0
             GroupMembersScreen(navController = navController, groupId = groupId)
         }
-        /*
+
         composable("joinRequests/{groupId}") { backStackEntry ->
             val groupId = backStackEntry.arguments?.getString("groupId")?.toInt() ?: 0
             JoinRequestsScreen(navController = navController, groupId = groupId)
         }
+        /*
         composable("editGroup/{groupId}") { backStackEntry ->
             val groupId = backStackEntry.arguments?.getString("groupId")?.toInt() ?: 0
             EditGroupScreen(navController = navController, groupId = groupId)
         }
-
          */
         composable("${ScreenName.PostDetail}/{post.id}") { backStackEntry ->
             val postId = backStackEntry.arguments?.getString("post.id")?.toIntOrNull()
