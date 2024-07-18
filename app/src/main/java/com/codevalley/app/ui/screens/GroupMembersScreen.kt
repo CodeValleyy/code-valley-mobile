@@ -69,6 +69,9 @@ fun GroupMembersScreen(
                                 },
                                 onRemoveClick = {
                                     groupMembersViewModel.removeMember(groupId, member.id)
+                                },
+                                onMakeAdminClick = {
+                                    groupMembersViewModel.makeAdmin(groupId, member.id)
                                 }
                             )
                         }

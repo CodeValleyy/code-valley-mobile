@@ -1,5 +1,6 @@
 package com.codevalley.app.repository
 
+import android.util.Log
 import com.codevalley.app.model.GroupDTO
 import com.codevalley.app.model.GroupResponseDTO
 import com.codevalley.app.network.GroupService

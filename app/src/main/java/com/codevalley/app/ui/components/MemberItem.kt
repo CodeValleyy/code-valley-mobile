@@ -25,10 +25,15 @@ fun MemberItem(
     currentUserIsAdmin: Boolean,
     memberIsAdmin: Boolean,
     onProfileClick: () -> Unit,
-    onRemoveClick: () -> Unit
+    onRemoveClick: () -> Unit,
+    onMakeAdminClick: () -> Unit
 ) {
     val canRemove = remember {
         currentUserIsAdmin && currentUserId != member.id && !memberIsAdmin
+    }
+
+    val canMakeAdmin = remember {
+        currentUserIsAdmin && !memberIsAdmin
     }
 
     Row(
@@ -48,8 +53,13 @@ fun MemberItem(
             Text("Profile")
         }
         if (canRemove) {
-            Button(onClick = onRemoveClick, colors = ButtonDefaults.buttonColors(backgroundColor = Color.Red)) {
+            Button(onClick = onRemoveClick, colors = ButtonDefaults.buttonColors(backgroundColor = Color.Red), modifier = Modifier.padding(end = 8.dp)) {
                 Text("Remove", color = Color.White)
+            }
+        }
+        if (canMakeAdmin && !memberIsAdmin && currentUserId != member.id) {
+            Button(onClick = onMakeAdminClick, colors = ButtonDefaults.buttonColors(backgroundColor = Color.Blue)) {
+                Text("Make Admin", color = Color.White)
             }
         }
     }

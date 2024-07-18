@@ -1,5 +1,6 @@
 package com.codevalley.app.ui.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.codevalley.app.model.UserResponseDTO
@@ -48,6 +49,23 @@ class GroupMembersViewModel @Inject constructor(
                 groupRepository.removeUserFromGroup(groupId, userId)
                 loadMembers(groupId)
             } catch (e: Exception) {
+                _error.value = e.message
+            } finally {
+                _loading.value = false
+            }
+        }
+    }
+
+    fun makeAdmin(groupId: Int, userId: Int) {
+        viewModelScope.launch {
+            _loading.value = true
+            _error.value = null
+            try {
+                Log.d("GroupRepository", "addAdmin: $groupId, $userId")
+                groupRepository.addAdmin(groupId, userId)
+                loadMembers(groupId)
+            } catch (e: Exception) {
+                e.printStackTrace()
                 _error.value = e.message
             } finally {
                 _loading.value = false
