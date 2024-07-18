@@ -10,7 +10,9 @@ interface GroupService {
     @Multipart
     @POST("/groups/create")
     suspend fun createGroup(
-        @Part("groupDTO") groupDTO: RequestBody,
+        @Part("name") name: RequestBody,
+        @Part("description") description: RequestBody,
+        @Part("isPublic") isPublic: RequestBody,
         @Part file: MultipartBody.Part?
     ): GroupResponseDTO
 

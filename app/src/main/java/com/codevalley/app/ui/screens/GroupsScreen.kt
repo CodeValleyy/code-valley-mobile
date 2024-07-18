@@ -25,6 +25,7 @@ import coil.compose.rememberAsyncImagePainter
 import com.codevalley.app.ui.viewmodel.GroupsViewModel
 import com.codevalley.app.model.GroupResponseDTO
 import com.codevalley.app.store.UserStore
+import com.codevalley.app.ui.components.CreateGroupDialog
 
 @Composable
 fun GroupsScreen(
@@ -37,6 +38,7 @@ fun GroupsScreen(
     val context = LocalContext.current
     var searchText by remember { mutableStateOf("") }
     val currentUser = UserStore.currentUser.collectAsState()
+    var showDialog by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -49,7 +51,7 @@ fun GroupsScreen(
         },
         floatingActionButton = {
             FloatingActionButton(onClick = {
-                // Handle group creation
+                showDialog = true
             }) {
                 Icon(Icons.Default.Add, contentDescription = "Create Group")
             }
@@ -105,6 +107,16 @@ fun GroupsScreen(
                 }
             }
         }
+
+        if (showDialog) {
+            CreateGroupDialog(
+                onDismiss = { showDialog = false },
+                onCreate = { groupDTO, file ->
+                    groupsViewModel.createGroup(groupDTO, file)
+                    showDialog = false
+                }
+            )
+        }
     }
 }
 
@@ -150,3 +162,4 @@ fun GroupItem(group: GroupResponseDTO, currentUserId: Int?, onJoinClick: () -> U
         }
     }
 }
+

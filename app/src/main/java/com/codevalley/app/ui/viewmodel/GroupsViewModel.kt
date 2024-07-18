@@ -55,6 +55,7 @@ class GroupsViewModel @Inject constructor(
                 groupRepository.createGroup(groupDTO, file)
                 loadGroups()
             } catch (e: Exception) {
+                e.printStackTrace()
                 _error.value = e.message
             } finally {
                 _loading.value = false
