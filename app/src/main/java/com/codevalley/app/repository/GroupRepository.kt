@@ -31,9 +31,12 @@ class GroupRepository @Inject constructor(
 
     suspend fun updateGroup(groupId: Int, updateGroupDTO: GroupDTO, file: MultipartBody.Part?): GroupResponseDTO {
         val groupService = createAuthorizedApiService()
-        val json = Gson().toJson(updateGroupDTO)
-        val updateGroupDTORequestBody = json.toRequestBody("application/json".toMediaTypeOrNull())
-        return groupService.updateGroup(groupId, updateGroupDTORequestBody, file)
+
+        val name = updateGroupDTO.name.toRequestBody("text/plain".toMediaTypeOrNull())
+        val description = updateGroupDTO.description.toRequestBody("text/plain".toMediaTypeOrNull())
+        val isPublic = updateGroupDTO.isPublic.toString().toRequestBody("text/plain".toMediaTypeOrNull())
+
+        return groupService.updateGroup(groupId, name, description, isPublic, file)
     }
 
     suspend fun addUserToGroup(groupId: Int, userId: Int): GroupResponseDTO {

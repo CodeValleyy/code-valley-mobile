@@ -6,6 +6,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.codevalley.app.ui.screens.CurrentUserScreen
+import com.codevalley.app.ui.screens.EditGroupScreen
 import com.codevalley.app.ui.screens.FollowersScreen
 import com.codevalley.app.ui.screens.FollowingScreen
 import com.codevalley.app.ui.screens.GroupMembersScreen
@@ -71,16 +72,16 @@ fun AppNavigation(navController: NavHostController = rememberNavController()) {
             GroupMembersScreen(navController = navController, groupId = groupId)
         }
 
-        composable("joinRequests/{groupId}") { backStackEntry ->
+        composable("${ScreenName.JoinRequests}/{groupId}") { backStackEntry ->
             val groupId = backStackEntry.arguments?.getString("groupId")?.toInt() ?: 0
             JoinRequestsScreen(navController = navController, groupId = groupId)
         }
-        /*
-        composable("editGroup/{groupId}") { backStackEntry ->
+
+        composable("${ScreenName.EditGroup}/{groupId}") { backStackEntry ->
             val groupId = backStackEntry.arguments?.getString("groupId")?.toInt() ?: 0
             EditGroupScreen(navController = navController, groupId = groupId)
         }
-         */
+
         composable("${ScreenName.PostDetail}/{post.id}") { backStackEntry ->
             val postId = backStackEntry.arguments?.getString("post.id")?.toIntOrNull()
             if (postId != null) {

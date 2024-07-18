@@ -20,7 +20,9 @@ interface GroupService {
     @PATCH("/groups/update/{groupId}")
     suspend fun updateGroup(
         @Path("groupId") groupId: Int,
-        @Part("groupDTO") updateGroupDTO: RequestBody,
+        @Part("name") name: RequestBody,
+        @Part("description") description: RequestBody,
+        @Part("isPublic") isPublic: RequestBody,
         @Part file: MultipartBody.Part?
     ): GroupResponseDTO
 
