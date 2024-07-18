@@ -10,9 +10,9 @@ import com.codevalley.app.model.PostResponseDto
 import com.codevalley.app.model.UserResponseDTO
 import com.codevalley.app.repository.FriendshipRepository
 import com.codevalley.app.repository.PostRepository
+import com.codevalley.app.repository.UserRepository
 import com.codevalley.app.store.PostStore
 import com.codevalley.app.store.UserStore
-import com.codevalley.app.utils.PostUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -43,21 +43,18 @@ class NewsFeedViewModel @Inject constructor(
     private var currentOffset = 0
     private val pageSize = 2
 
-    val userProfile: UserResponseDTO?
-        get() = UserStore.userProfile
-
     fun loadMorePosts() {
         viewModelScope.launch {
             _isLoading.value = true
             try {
-                val newPosts = postRepository.fetchPosts(pageSize, currentOffset)
-                currentOffset += newPosts.size
-                PostStore.setPosts((PostStore.posts.value + newPosts))
+                val posts = postRepository.fetchPosts(1000, currentOffset)
+                PostStore.setPosts(posts)
             } catch (e: Exception) {
                 _errorMessage.value = "Failed to load posts."
             } finally {
                 _isLoading.value = false
             }
+            _isLoading.value = false
         }
     }
 
@@ -165,7 +162,6 @@ class NewsFeedViewModel @Inject constructor(
                 _errorMessage.value = "Failed to delete post."
             }
         }
-
     }
 
     private fun updatePostLocal(postId: Int, update: (PostResponseDto) -> PostResponseDto) {

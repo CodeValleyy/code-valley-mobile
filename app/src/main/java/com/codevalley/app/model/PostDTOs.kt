@@ -26,8 +26,7 @@ data class RawPostResponseDto(
     val avatar: String?,
     val likes: Int,
     val userHasLiked: Boolean,
-) {
-}
+)
 
 data class PostResponseDto(
     val id: Int,

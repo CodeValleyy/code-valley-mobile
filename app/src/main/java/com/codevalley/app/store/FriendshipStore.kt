@@ -5,7 +5,7 @@ import com.codevalley.app.model.UserItemDTO
 import kotlinx.coroutines.flow.MutableStateFlow
 
 object FriendshipStore {
-   private val _friends = MutableStateFlow<List<UserItemDTO.UserFriend>>(emptyList())
+    private val _friends = MutableStateFlow<List<UserItemDTO.UserFriend>>(emptyList())
     val friends = _friends
 
     private val _pendingRequests = MutableStateFlow<List<UserItemDTO.UserFriend>>(emptyList())

@@ -6,14 +6,15 @@ enum class ScreenName(private val value: String) {
     Register("Register"),
     NewsFeed("newsfeed"),
     Profile("profile"),
+    CurrentUser("currentUser"),
     Settings("settings"),
     PostDetail("postDetail"),
     Followers("followers"),
     Following("following"),
-    UserSearch("userSearch");
+    UserSearch("userSearch"),
+    Notification("notification");
 
     override fun toString(): String {
         return value
     }
-
 }

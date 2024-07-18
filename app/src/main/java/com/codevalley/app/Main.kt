@@ -30,10 +30,9 @@ class MainActivity : ComponentActivity() {
 
                 LaunchedEffect(Unit) {
                     scope.launch {
-                        if (TokenManager.token != null) {
+                        if (!TokenManager.token.isNullOrEmpty()) {
                             try {
-                                val profile = userRepository.getMe()
-                                UserStore.userProfile = profile
+                                UserStore.setUserProfile(userRepository.getMe())
                                 navController.navigate(ScreenName.NewsFeed.toString()) {
                                     popUpTo(ScreenName.Main.toString()) { inclusive = true }
                                 }
