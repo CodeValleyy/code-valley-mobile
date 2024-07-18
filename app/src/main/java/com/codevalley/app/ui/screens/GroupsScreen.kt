@@ -1,14 +1,13 @@
 package com.codevalley.app.ui.screens
 
 import android.widget.Toast
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -26,6 +25,8 @@ import com.codevalley.app.ui.viewmodel.GroupsViewModel
 import com.codevalley.app.model.GroupResponseDTO
 import com.codevalley.app.store.UserStore
 import com.codevalley.app.ui.components.CreateGroupDialog
+import com.codevalley.app.ui.components.GroupItem
+import com.codevalley.app.ui.navigation.ScreenName
 
 @Composable
 fun GroupsScreen(
@@ -46,7 +47,12 @@ fun GroupsScreen(
                 title = { Text("Groups") },
                 backgroundColor = Color(0xFF6200EE),
                 contentColor = Color.White,
-                elevation = 12.dp
+                elevation = 12.dp,
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                    }
+                }
             )
         },
         floatingActionButton = {
@@ -93,6 +99,9 @@ fun GroupsScreen(
                                         Toast.makeText(context, "Join request sent", Toast.LENGTH_SHORT).show()
                                     }
                                 )
+                            },
+                            onGroupClick = { groupId ->
+                                navController.navigate("${ScreenName.Messages}/$groupId")
                             }
                         )
                     }
@@ -119,47 +128,3 @@ fun GroupsScreen(
         }
     }
 }
-
-@Composable
-fun GroupItem(group: GroupResponseDTO, currentUserId: Int?, onJoinClick: () -> Unit) {
-    val isMember = group.members.any { it.id == currentUserId }
-
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp)
-            .background(Color.White),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Image(
-            painter = rememberAsyncImagePainter(group.avatar),
-            contentDescription = "Group Avatar",
-            contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .size(40.dp)
-                .background(Color.Gray)
-        )
-        Spacer(modifier = Modifier.width(16.dp))
-        Column(
-            modifier = Modifier
-                .weight(1f)
-                .clickable { if (!isMember) onJoinClick() }
-        ) {
-            Text(text = group.name, fontWeight = FontWeight.Bold, fontSize = 18.sp)
-            group.description?.let {
-                Text(text = it, fontSize = 14.sp, color = Color.Gray)
-            }
-        }
-        if (!isMember) {
-            Button(
-                onClick = onJoinClick,
-                modifier = Modifier
-                    .padding(start = 8.dp)
-                    .align(Alignment.CenterVertically)
-            ) {
-                Text(text = "Join")
-            }
-        }
-    }
-}
-

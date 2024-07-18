@@ -8,10 +8,12 @@ import androidx.navigation.compose.rememberNavController
 import com.codevalley.app.ui.screens.CurrentUserScreen
 import com.codevalley.app.ui.screens.FollowersScreen
 import com.codevalley.app.ui.screens.FollowingScreen
+import com.codevalley.app.ui.screens.GroupMembersScreen
 import com.codevalley.app.ui.screens.GroupsScreen
 import com.codevalley.app.ui.screens.PostDetailScreen
 import com.codevalley.app.ui.screens.LoginScreen
 import com.codevalley.app.ui.screens.MainScreen
+import com.codevalley.app.ui.screens.MessageScreen
 import com.codevalley.app.ui.screens.NewsFeedScreen
 import com.codevalley.app.ui.screens.NotificationScreen
 import com.codevalley.app.ui.screens.ProfileScreen
@@ -56,7 +58,28 @@ fun AppNavigation(navController: NavHostController = rememberNavController()) {
         composable(ScreenName.Groups.toString()) {
             GroupsScreen(navController)
         }
+        composable("${ScreenName.Messages}/{groupId}") { backStackEntry ->
+            MessageScreen(
+                groupId = backStackEntry.arguments?.getString("groupId")?.toInt() ?: 0,
+                navController = navController
+            )
+        }
 
+        composable("${ScreenName.GroupMembers}/{groupId}") { backStackEntry ->
+            val groupId = backStackEntry.arguments?.getString("groupId")?.toInt() ?: 0
+            GroupMembersScreen(navController = navController, groupId = groupId)
+        }
+        /*
+        composable("joinRequests/{groupId}") { backStackEntry ->
+            val groupId = backStackEntry.arguments?.getString("groupId")?.toInt() ?: 0
+            JoinRequestsScreen(navController = navController, groupId = groupId)
+        }
+        composable("editGroup/{groupId}") { backStackEntry ->
+            val groupId = backStackEntry.arguments?.getString("groupId")?.toInt() ?: 0
+            EditGroupScreen(navController = navController, groupId = groupId)
+        }
+
+         */
         composable("${ScreenName.PostDetail}/{post.id}") { backStackEntry ->
             val postId = backStackEntry.arguments?.getString("post.id")?.toIntOrNull()
             if (postId != null) {
