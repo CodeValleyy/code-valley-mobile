@@ -1,9 +1,13 @@
 package com.codevalley.app.repository
 
-import com.codevalley.app.model.GroupResponseDTO
 import com.codevalley.app.model.GroupDTO
+import com.codevalley.app.model.GroupResponseDTO
 import com.codevalley.app.network.GroupService
 import com.codevalley.app.network.createAuthorizedApiService
+import com.google.gson.Gson
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.toRequestBody
 import retrofit2.Retrofit
 import javax.inject.Inject
 
@@ -15,14 +19,43 @@ class GroupRepository @Inject constructor(
         return createAuthorizedApiService(retrofit, GroupService::class.java)
     }
 
-    suspend fun createGroup(groupDTO: GroupDTO): GroupResponseDTO {
+    suspend fun createGroup(groupDTO: GroupDTO, file: MultipartBody.Part?): GroupResponseDTO {
         val groupService = createAuthorizedApiService()
-        return groupService.createGroup(groupDTO)
+        val json = Gson().toJson(groupDTO)
+        val groupDTORequestBody = json.toRequestBody("application/json".toMediaTypeOrNull())
+        return groupService.createGroup(groupDTORequestBody, file)
+    }
+
+    suspend fun updateGroup(groupId: Int, updateGroupDTO: GroupDTO, file: MultipartBody.Part?): GroupResponseDTO {
+        val groupService = createAuthorizedApiService()
+        val json = Gson().toJson(updateGroupDTO)
+        val updateGroupDTORequestBody = json.toRequestBody("application/json".toMediaTypeOrNull())
+        return groupService.updateGroup(groupId, updateGroupDTORequestBody, file)
     }
 
     suspend fun addUserToGroup(groupId: Int, userId: Int): GroupResponseDTO {
         val groupService = createAuthorizedApiService()
         return groupService.addUserToGroup(groupId, userId)
+    }
+
+    suspend fun addAdmin(groupId: Int, userId: Int): GroupResponseDTO {
+        val groupService = createAuthorizedApiService()
+        return groupService.addAdmin(groupId, userId)
+    }
+
+    suspend fun sendJoinRequest(groupId: Int, userId: Int): GroupResponseDTO {
+        val groupService = createAuthorizedApiService()
+        return groupService.sendJoinRequest(groupId, userId)
+    }
+
+    suspend fun acceptJoinRequest(groupId: Int, userId: Int): GroupResponseDTO {
+        val groupService = createAuthorizedApiService()
+        return groupService.acceptJoinRequest(groupId, userId)
+    }
+
+    suspend fun refuseJoinRequest(groupId: Int, userId: Int) {
+        val groupService = createAuthorizedApiService()
+        groupService.refuseJoinRequest(groupId, userId)
     }
 
     suspend fun removeUserFromGroup(groupId: Int, userId: Int) {
@@ -35,7 +68,12 @@ class GroupRepository @Inject constructor(
         return groupService.listGroups()
     }
 
-    suspend fun getGroupDetails(groupId: Int): GroupResponseDTO {
+    suspend fun searchProfile(name: String): List<GroupResponseDTO> {
+        val groupService = createAuthorizedApiService()
+        return groupService.searchProfile(name)
+    }
+
+    suspend fun getGroupDetails(groupId: Int): GroupResponseDTO? {
         val groupService = createAuthorizedApiService()
         return groupService.getGroupDetails(groupId)
     }

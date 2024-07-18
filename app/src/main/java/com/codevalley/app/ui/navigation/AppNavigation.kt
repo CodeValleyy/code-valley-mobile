@@ -8,6 +8,7 @@ import androidx.navigation.compose.rememberNavController
 import com.codevalley.app.ui.screens.CurrentUserScreen
 import com.codevalley.app.ui.screens.FollowersScreen
 import com.codevalley.app.ui.screens.FollowingScreen
+import com.codevalley.app.ui.screens.GroupsScreen
 import com.codevalley.app.ui.screens.PostDetailScreen
 import com.codevalley.app.ui.screens.LoginScreen
 import com.codevalley.app.ui.screens.MainScreen
@@ -51,6 +52,9 @@ fun AppNavigation(navController: NavHostController = rememberNavController()) {
         }
         composable(ScreenName.UserSearch.toString()) {
             UserSearchScreen(navController)
+        }
+        composable(ScreenName.Groups.toString()) {
+            GroupsScreen(navController)
         }
 
         composable("${ScreenName.PostDetail}/{post.id}") { backStackEntry ->
