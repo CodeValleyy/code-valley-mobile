@@ -1,16 +1,21 @@
 package com.codevalley.app.ui.screens
 
+import android.annotation.SuppressLint
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -23,13 +28,12 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.codevalley.app.store.UserStore
-import com.codevalley.app.ui.components.AvatarComponent
 import com.codevalley.app.ui.components.LoadingIndicator
 import com.codevalley.app.ui.components.NotificationItem
 import com.codevalley.app.ui.theme.CodeValleyTheme
 import com.codevalley.app.ui.viewmodel.NotificationViewModel
 
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun NotificationScreen(navController: NavController, notificationViewModel: NotificationViewModel = hiltViewModel()) {
     val notifications by notificationViewModel.notifications.collectAsState()
@@ -37,11 +41,14 @@ fun NotificationScreen(navController: NavController, notificationViewModel: Noti
     val isLoading = notificationViewModel.isLoading
     val errorMessage = notificationViewModel.errorMessage
     val context = LocalContext.current
-    val currentUser = UserStore.getUserProfile()
 
     LaunchedEffect(Unit) {
         notificationViewModel.loadUnreadNotificationsCount()
         notificationViewModel.loadNotifications()
+    }
+
+    BackHandler {
+        navController.popBackStack()
     }
 
     Scaffold(
@@ -52,14 +59,19 @@ fun NotificationScreen(navController: NavController, notificationViewModel: Noti
                 },
                 backgroundColor = MaterialTheme.colors.primary,
                 contentColor = Color.White,
-                modifier = Modifier.height(56.dp),
-                actions = { AvatarComponent(navController, currentUser) }
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                    }
+                }
             )
         },
-        content = { padding ->
-            Column(modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)) {
+        content = {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(8.dp),
+            ) {
                 if (errorMessage.isNotEmpty()) {
                     Toast.makeText(context, errorMessage, Toast.LENGTH_SHORT).show()
                 }

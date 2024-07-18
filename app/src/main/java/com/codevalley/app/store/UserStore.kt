@@ -15,4 +15,8 @@ object UserStore {
     fun setUserProfile(user: UserResponseDTO) {
         _currentUser.value = user
     }
+
+    fun clearUserProfile() {
+        _currentUser.value = null
+    }
 }

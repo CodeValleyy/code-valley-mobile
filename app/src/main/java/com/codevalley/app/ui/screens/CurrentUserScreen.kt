@@ -8,8 +8,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -23,43 +21,50 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
 import com.codevalley.app.store.FriendshipStore
 import com.codevalley.app.store.PostStore
+import com.codevalley.app.store.UserStore
 import com.codevalley.app.ui.components.LoadingIndicator
 import com.codevalley.app.ui.navigation.ScreenName
-import com.codevalley.app.ui.viewmodel.ProfileViewModel
+import com.codevalley.app.ui.viewmodel.CurrentUserViewModel
 import com.codevalley.app.utils.Constants
 
 @Composable
-fun CurrentUserScreen(navController: NavController, profileViewModel: ProfileViewModel = hiltViewModel()) {
-    val currentUser by profileViewModel.currentUser.collectAsState()
-    val isLoading by profileViewModel::isLoading
-    val errorMessage by profileViewModel::errorMessage
-    var imageUri by remember { mutableStateOf<Uri?>(null) }
+fun CurrentUserScreen(navController: NavController, currentUserViewModel: CurrentUserViewModel = hiltViewModel()) {
+    val currentUser by UserStore.currentUser.collectAsState()
+    val isLoading by currentUserViewModel::isLoading
+    val errorMessage by currentUserViewModel::errorMessage
     val numberOfPostsByUserId = PostStore.getNumberOfPostsByUserId(currentUser!!.id)
     var numberOfFollowers by remember { mutableIntStateOf(0) }
     var numberOfFollowing by remember { mutableIntStateOf(0) }
     val countFollowersAndFollowing by FriendshipStore.followersAndFollowingsCount.collectAsState()
+    val countNotification by currentUserViewModel::countNotification
 
-    val userPosts by remember { mutableStateOf(PostStore.getPostsByUserId(currentUser!!.id)) }
-    val isFollowing by profileViewModel::isFollowing
+    val avatar = if (currentUser?.avatar.isNullOrEmpty()) {
+        Constants.DEFAULT_AVATAR_URL
+    } else {
+        currentUser?.avatar!!
+    }
 
     val imagePickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         uri?.let {
-            imageUri = it
-            profileViewModel.uploadAvatar(currentUser!!.id, it)
+            currentUserViewModel.uploadAvatar(currentUser!!.id, it)
         }
     }
 
     LaunchedEffect(Unit) {
-        profileViewModel.loadProfile(currentUser!!.id)
-        profileViewModel.countFollowersAndFollowing(currentUser!!.id)
+        currentUserViewModel.loadProfile(currentUser!!.id)
+        currentUserViewModel.countFollowersAndFollowing(currentUser!!.id)
+        currentUserViewModel.countUnreadNotifications()
     }
 
     LaunchedEffect(countFollowersAndFollowing) {
@@ -73,6 +78,7 @@ fun CurrentUserScreen(navController: NavController, profileViewModel: ProfileVie
         navController.popBackStack()
     }
 
+
     if (isLoading) {
         LoadingIndicator()
     } else if (errorMessage != null) {
@@ -83,7 +89,7 @@ fun CurrentUserScreen(navController: NavController, profileViewModel: ProfileVie
             confirmButton = {
                 Button(
                     onClick = {
-                        profileViewModel.errorMessage = null
+                        currentUserViewModel.errorMessage = null
                         navController.navigate(ScreenName.Main.toString()) {
                             popUpTo(ScreenName.Profile.toString()) { inclusive = true }
                         }
@@ -99,7 +105,9 @@ fun CurrentUserScreen(navController: NavController, profileViewModel: ProfileVie
             color = MaterialTheme.colors.background
         ) {
             Box(
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp)
             ) {
                 IconButton(
                     onClick = {
@@ -109,7 +117,6 @@ fun CurrentUserScreen(navController: NavController, profileViewModel: ProfileVie
                     },
                     modifier = Modifier
                         .align(Alignment.TopStart)
-                        .padding(16.dp)
                 ) {
                     Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                 }
@@ -118,7 +125,6 @@ fun CurrentUserScreen(navController: NavController, profileViewModel: ProfileVie
                     onClick = { navController.navigate(ScreenName.Settings.toString()) },
                     modifier = Modifier
                         .align(Alignment.TopEnd)
-                        .padding(16.dp)
                 ) {
                     Icon(imageVector = Icons.Default.Settings, contentDescription = "Settings")
                 }
@@ -127,17 +133,9 @@ fun CurrentUserScreen(navController: NavController, profileViewModel: ProfileVie
                     verticalArrangement = Arrangement.Center,
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(16.dp)
                 ) {
-                    val avatarUrl = if (currentUser?.avatar.isNullOrEmpty()) {
-                        Constants.DEFAULT_AVATAR_URL
-                    } else {
-                        "${currentUser?.username}"
-                    }
-                    val painter = rememberAsyncImagePainter(avatarUrl)
-
                     Image(
-                        painter = painter,
+                        painter = rememberAsyncImagePainter(avatar),
                         contentDescription = null,
                         modifier = Modifier
                             .size(100.dp)
@@ -159,27 +157,6 @@ fun CurrentUserScreen(navController: NavController, profileViewModel: ProfileVie
                         textAlign = TextAlign.Center
                     )
                     Spacer(modifier = Modifier.height(32.dp))
-                    LazyColumn(
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        item {
-                            Row(
-                                horizontalArrangement = Arrangement.SpaceEvenly,
-                                modifier = Modifier.fillMaxWidth()
-                            ) {
-                                Button(onClick = {
-                                    if (isFollowing) {
-                                        profileViewModel.unfollowUser(currentUser!!.id)
-                                    } else {
-                                        profileViewModel.followUser(currentUser!!.id)
-                                    }
-                                }) {
-                                    Text(text = if (isFollowing) "Unfollow" else "Follow")
-                                }
-                            }
-                        }
-                    }
-                    Spacer(modifier = Modifier.height(32.dp))
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceEvenly
@@ -198,19 +175,69 @@ fun CurrentUserScreen(navController: NavController, profileViewModel: ProfileVie
                             }
                         })
                     }
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Text("User posts here")
-                    LazyColumn(
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        items(userPosts) { post ->
-                            PostItem(post = post, onClick = {
-                                navController.navigate("${ScreenName.PostDetail}/${post.id}")
-                            })
-                        }
+                    Spacer(modifier = Modifier.height(32.dp))
+                    Column {
+                        DividerRow()
+                        OptionItem("Notification", countNotification, onClick = {
+                            navController.navigate(ScreenName.Notification.toString())
+                        })
+                        DividerRow()
+                        OptionItem(label = "Friends", onClick = {
+                            navController.navigate(ScreenName.Followers.toString() + "/${currentUser?.id}/${currentUser?.id}") {
+                                popUpTo(ScreenName.Profile.toString()) { inclusive = true }
+                            }
+                        })
+                        DividerRow()
+                        OptionItem(label = "Messages")
+                        DividerRow()
+                        OptionItem(label = "Favorites")
+                        DividerRow()
+                        OptionItem(label = "Log out", onClick = {
+                            currentUserViewModel.logout()
+                            navController.navigate(ScreenName.Login.toString())
+                        })
+                        DividerRow()
                     }
                 }
             }
         }
     }
+}
+
+@Composable
+fun OptionItem(label: String, count: Int = 0, onClick: () -> Unit = {}) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 20.dp)
+            .clickable { onClick() },
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(text = label, fontSize = 18.sp, modifier = Modifier.weight(1f))
+        if (count != 0) {
+            Box(
+                modifier = Modifier
+                    .size(24.dp)
+                    .background(Color(0xFF6200EE), shape = CircleShape),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(text = count.toString(), color = Color.White, fontSize = 14.sp)
+            }
+        }
+    }
+}
+
+@Composable
+fun DividerRow() {
+    Row(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Divider(modifier = Modifier.weight(1f))
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun CurrentUserPreview() {
+    CurrentUserScreen(rememberNavController())
 }

@@ -1,9 +1,6 @@
 package com.codevalley.app.ui.screens
 
-import android.net.Uri
 import androidx.activity.compose.BackHandler
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -14,7 +11,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -44,7 +40,6 @@ fun ProfileScreen(userId: Int, navController: NavController,
     val currentUser by profileViewModel.currentUser.collectAsState()
     val isLoading by profileViewModel::isLoading
     val errorMessage by profileViewModel::errorMessage
-    var imageUri by remember { mutableStateOf<Uri?>(null) }
     val numberOfPostsByUserId = PostStore.getNumberOfPostsByUserId(userId)
     var numberOfFollowers by remember { mutableIntStateOf(0) }
     var numberOfFollowing by remember { mutableIntStateOf(0) }
@@ -53,13 +48,10 @@ fun ProfileScreen(userId: Int, navController: NavController,
     val userPosts by remember { mutableStateOf(PostStore.getPostsByUserId(userId)) }
     val isFollowing by profileViewModel::isFollowing
 
-    val imagePickerLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
-    ) { uri: Uri? ->
-        uri?.let {
-            imageUri = it
-            profileViewModel.uploadAvatar(userId, it)
-        }
+    val avatarUrl = if (profileState?.avatar.isNullOrEmpty()) {
+        Constants.DEFAULT_AVATAR_URL
+    } else {
+        profileState?.avatar!!
     }
 
     LaunchedEffect(Unit) {
@@ -119,16 +111,6 @@ fun ProfileScreen(userId: Int, navController: NavController,
                     Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                 }
 
-                if (currentUser?.id == userId) {
-                    IconButton(
-                        onClick = { navController.navigate(ScreenName.Settings.toString()) },
-                        modifier = Modifier
-                            .align(Alignment.TopEnd)
-                            .padding(16.dp)
-                    ) {
-                        Icon(imageVector = Icons.Default.Settings, contentDescription = "Settings")
-                    }
-                }
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center,
@@ -136,23 +118,13 @@ fun ProfileScreen(userId: Int, navController: NavController,
                         .fillMaxSize()
                         .padding(16.dp)
                 ) {
-                    val avatarUrl = if (profileState?.avatar.isNullOrEmpty()) {
-                        Constants.DEFAULT_AVATAR_URL
-                    } else {
-                        profileState?.avatar!!
-                    }
-                    val painter = rememberAsyncImagePainter(avatarUrl)
-
                     Image(
-                        painter = painter,
+                        painter = rememberAsyncImagePainter(avatarUrl),
                         contentDescription = null,
                         modifier = Modifier
                             .size(100.dp)
                             .clip(CircleShape)
-                            .background(MaterialTheme.colors.surface)
-                            .clickable(enabled = currentUser?.id == userId) {
-                                imagePickerLauncher.launch("image/*")
-                            },
+                            .background(MaterialTheme.colors.surface),
                         contentScale = ContentScale.Crop
                     )
                     Spacer(modifier = Modifier.height(16.dp))
@@ -168,24 +140,22 @@ fun ProfileScreen(userId: Int, navController: NavController,
                         textAlign = TextAlign.Center
                     )
                     Spacer(modifier = Modifier.height(32.dp))
-                    if (currentUser?.id != userId) {
-                        LazyColumn(
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            item {
-                                Row(
-                                    horizontalArrangement = Arrangement.SpaceEvenly,
-                                    modifier = Modifier.fillMaxWidth()
-                                ) {
-                                    Button(onClick = {
-                                        if (isFollowing) {
-                                            profileViewModel.unfollowUser(userId)
-                                        } else {
-                                            profileViewModel.followUser(userId)
-                                        }
-                                    }) {
-                                        Text(text = if (isFollowing) "Unfollow" else "Follow")
+                    LazyColumn(
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        item {
+                            Row(
+                                horizontalArrangement = Arrangement.SpaceEvenly,
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Button(onClick = {
+                                    if (isFollowing) {
+                                        profileViewModel.unfollowUser(userId)
+                                    } else {
+                                        profileViewModel.followUser(userId)
                                     }
+                                }) {
+                                    Text(text = if (isFollowing) "Unfollow" else "Follow")
                                 }
                             }
                         }
