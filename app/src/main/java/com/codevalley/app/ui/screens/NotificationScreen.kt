@@ -83,7 +83,7 @@ fun NotificationScreen(navController: NavController, notificationViewModel: Noti
                         modifier = Modifier.fillMaxSize()
                     ) {
                         items(notifications) { notification ->
-                            NotificationItem(notification)
+                            NotificationItem(notification, navController)
                         }
                     }
                 }
