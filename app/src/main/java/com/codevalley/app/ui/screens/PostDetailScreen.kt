@@ -12,7 +12,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.codevalley.app.model.Comment
 import com.codevalley.app.store.PostStore
 import com.codevalley.app.store.UserStore
 import com.codevalley.app.ui.components.CommentInputSection
@@ -20,14 +19,26 @@ import com.codevalley.app.ui.components.CommentItem
 import com.codevalley.app.ui.components.LoadingIndicator
 import com.codevalley.app.ui.components.PostItem
 import com.codevalley.app.ui.viewmodel.NewsFeedViewModel
-import java.util.*
+import com.codevalley.app.ui.viewmodel.PostCommentViewModel
 
 @Composable
-fun PostDetailScreen(postId: Int, navController: NavController, newsFeedViewModel: NewsFeedViewModel = hiltViewModel()) {
+fun PostDetailScreen(
+    postId: Int,
+    navController: NavController,
+    newsFeedViewModel: NewsFeedViewModel = hiltViewModel(),
+    postCommentViewModel: PostCommentViewModel = hiltViewModel()
+) {
+
     val post = PostStore.getPostById(postId)
     var commentText by remember { mutableStateOf("") }
-    var comments by remember { mutableStateOf(listOf<Comment>()) }
-    val currentUser = UserStore.getUserProfile()
+    val comments by postCommentViewModel.comments.collectAsState()
+    val loading by postCommentViewModel.loading.collectAsState()
+    val error by postCommentViewModel.error.collectAsState()
+    val currentUser= UserStore.currentUser.collectAsState().value ?: UserStore.getUserProfile()
+
+    LaunchedEffect(postId) {
+        postCommentViewModel.loadComments(postId)
+    }
 
     if (post == null) {
         LoadingIndicator()
@@ -63,31 +74,25 @@ fun PostDetailScreen(postId: Int, navController: NavController, newsFeedViewMode
                 items(comments) { comment ->
                     CommentItem(
                         comment = comment,
-                        onLikeComment = {
-                            comments = comments.map {
-                                if (it.id == comment.id) it.copy(hasLiked = !it.hasLiked) else it
-                            }
+                        onDeleteComment = {
+                            postCommentViewModel.deleteComment(post.id, comment.id)
                         },
-                        onReplyComment = {
-                            // Handle reply action
-                        }
+                        onReplyComment = { /* Handle reply comment */ },
+                        currentUserId = currentUser?.id ?: 0
                     )
                 }
                 item {
                     CommentInputSection(commentText, onCommentTextChange = { commentText = it }, onPostComment = {
-                        val newComment = Comment(
-                            id = comments.size + 1,
-                            avatar = post.avatar ?: "",
-                            username = currentUser?.username ?: "Anonymous",
-                            content = commentText,
-                            userId = currentUser?.id ?: 0,
-                            createdAt = Date(),
-                            hasLiked = false,
-                        )
-                        comments = comments + newComment
+                        postCommentViewModel.addComment(post.id, commentText)
                         commentText = ""
                     })
                 }
+            }
+            if (loading) {
+                CircularProgressIndicator(modifier = Modifier.padding(padding))
+            }
+            error?.let {
+                Text(it, color = MaterialTheme.colors.error, modifier = Modifier.padding(padding))
             }
         }
     )

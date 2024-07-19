@@ -14,6 +14,7 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.outlined.Email
@@ -26,11 +27,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import com.codevalley.app.model.Comment
+import com.codevalley.app.model.CommentResponseDto
 import java.text.SimpleDateFormat
 import java.util.Locale
 
 @Composable
-fun CommentItem(comment: Comment, onLikeComment: () -> Unit, onReplyComment: () -> Unit) {
+fun CommentItem(
+    comment: CommentResponseDto,
+    onDeleteComment: () -> Unit,
+    onReplyComment: () -> Unit,
+    currentUserId: Int
+){
     val dateFormat = remember { SimpleDateFormat("dd MMMM yyyy", Locale.getDefault()) }
 
     Row(verticalAlignment = Alignment.Top, modifier = Modifier.padding(vertical = 8.dp)) {
@@ -52,18 +59,16 @@ fun CommentItem(comment: Comment, onLikeComment: () -> Unit, onReplyComment: () 
             Text(comment.content, style = MaterialTheme.typography.body1)
             Spacer(modifier = Modifier.height(4.dp))
             Row(verticalAlignment = Alignment.CenterVertically) {
-                IconButton(onClick = onLikeComment) {
-                    Icon(
-                        imageVector = if (comment.hasLiked) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
-                        contentDescription = null
-                    )
-                }
-                Spacer(modifier = Modifier.width(16.dp))
                 IconButton(onClick = onReplyComment) {
                     Icon(
                         imageVector = Icons.Outlined.Email,
                         contentDescription = "Reply"
                     )
+                }
+            }
+            if (comment.userId == currentUserId) {
+                IconButton(onClick = onDeleteComment) {
+                    Icon(Icons.Default.Delete, contentDescription = "Delete Comment")
                 }
             }
         }

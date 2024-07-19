@@ -12,12 +12,6 @@ data class GroupDTO(
     val isPublic: Boolean = false,
 )
 
-data class MultipartFile(
-    val fileName: String,
-    val fileType: String,
-    val fileContent: ByteArray
-)
-
 data class GroupResponseDTO(
     val id: Int,
     val name: String,
