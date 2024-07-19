@@ -1,16 +1,17 @@
 package com.codevalley.app.ui.viewmodel
 
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.codevalley.app.model.FriendshipStatus
 import com.codevalley.app.model.NotificationDto
 import com.codevalley.app.model.NotificationType
-import com.codevalley.app.model.UserResponseDTO
+import com.codevalley.app.repository.FriendshipRepository
 import com.codevalley.app.repository.NotificationRepository
 import com.codevalley.app.store.NotificationStore
-import com.codevalley.app.store.UserStore
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -20,13 +21,15 @@ import javax.inject.Inject
 
 @HiltViewModel
 class NotificationViewModel @Inject constructor(
-    private val notificationRepository: NotificationRepository
+    private val notificationRepository: NotificationRepository,
+    private val friendshipRepository: FriendshipRepository
 ) : ViewModel() {
 
     val notifications = NotificationStore.notifications
     val unreadNotificationsCount = NotificationStore.unreadNotificationsCount
     var isLoading by mutableStateOf(false)
     var errorMessage by mutableStateOf("")
+    var listIsFriendRequest by mutableStateOf(mutableListOf<Int>())
 
     fun loadNotifications() {
         viewModelScope.launch {
@@ -34,6 +37,11 @@ class NotificationViewModel @Inject constructor(
             try {
                 val newNotifications = notificationRepository.getNotifications(50)
                 NotificationStore.setNotifications(newNotifications)
+                for (notification in newNotifications) {
+                    if (notification.notificationType == NotificationType.friendshipReceived) {
+                        isFriendRequestPending(notification)
+                    }
+                }
                 errorMessage = ""
             } catch (e: Exception) {
                 errorMessage = "Failed to load notifications."
@@ -117,5 +125,44 @@ class NotificationViewModel @Inject constructor(
 
     fun formatDate(date: Date): String {
         return SimpleDateFormat("dd MMMM yyyy", Locale.getDefault()).format(date)
+    }
+
+    fun acceptFriendRequest(notification: NotificationDto) {
+        viewModelScope.launch {
+            try {
+                friendshipRepository.acceptFriendRequest(notification.fromUserId)
+                listIsFriendRequest.remove(notification.fromUserId)
+            } catch (e: Exception) {
+                errorMessage = "Failed to accept friend request."
+            }
+        }
+    }
+
+    fun declineFriendRequest(notification: NotificationDto) {
+        viewModelScope.launch {
+            try {
+                friendshipRepository.declineFriendRequest(notification.fromUserId)
+                listIsFriendRequest.remove(notification.fromUserId)
+            } catch (e: Exception) {
+                errorMessage = "Failed to decline friend request."
+            }
+        }
+    }
+
+    private fun isFriendRequestPending(notification: NotificationDto) {
+        viewModelScope.launch {
+            try {
+                val friendship = friendshipRepository.getFriendshipStatus(notification.fromUserId)
+                if (friendship.status == FriendshipStatus.PENDING) {
+                    listIsFriendRequest.add(notification.id)
+                }
+            } catch (e: Exception) {
+                errorMessage = "Failed to check if friend request is pending."
+            }
+        }
+    }
+
+    fun isFriendRequest(notification: NotificationDto): Boolean {
+        return listIsFriendRequest.contains(notification.id)
     }
 }

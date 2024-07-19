@@ -3,11 +3,14 @@ package com.codevalley.app.ui.components
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Button
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.Surface
@@ -24,15 +27,19 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import com.codevalley.app.model.NotificationDto
+import com.codevalley.app.model.NotificationType
+import com.codevalley.app.ui.navigation.ScreenName
 import com.codevalley.app.ui.viewmodel.NotificationViewModel
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 
 @Composable
-fun NotificationItem(notificationDto: NotificationDto, notificationViewModel: NotificationViewModel = hiltViewModel()) {
+fun NotificationItem(notificationDto: NotificationDto, navController: NavController, notificationViewModel: NotificationViewModel = hiltViewModel()) {
 
     var showMenu by remember { mutableStateOf(false) }
+    var showFriendRequestButton by remember { mutableStateOf(true) }
 
     val backgroundColor: Color
     val fontColor: Color
@@ -81,6 +88,33 @@ fun NotificationItem(notificationDto: NotificationDto, notificationViewModel: No
                 fontWeight = fontWeight
             )
             Spacer(modifier = Modifier.height(4.dp))
+            if (notificationViewModel.listIsFriendRequest.contains(notificationDto.id) && showFriendRequestButton) {
+                Row {
+                    Button(onClick = {
+                        notificationViewModel.acceptFriendRequest(notificationDto)
+                        notificationViewModel.seeNotification(notificationDto.id)
+                        showFriendRequestButton = false
+                    }) {
+                        Text(text = "Accept")
+                    }
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Button(onClick = {
+                        notificationViewModel.declineFriendRequest(notificationDto)
+                        notificationViewModel.seeNotification(notificationDto.id)
+                        showFriendRequestButton = false
+                    }) {
+                        Text(text = "Refuse")
+                    }
+                }
+            }
+            else if (notificationDto.notificationType == NotificationType.post || notificationDto.notificationType == NotificationType.like) {
+                Button(onClick = {
+                    notificationViewModel.seeNotification(notificationDto.id)
+                    navController.navigate("${ScreenName.PostDetail}/${notificationDto.linkId}")
+                }) {
+                    Text(text = "Check post")
+                }
+            }
             Text(
                 text = notificationViewModel.formatDate(notificationDto.createdAt),
                 fontSize = 12.sp,
