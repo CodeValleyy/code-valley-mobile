@@ -12,7 +12,12 @@ enum class ScreenName(private val value: String) {
     Followers("followers"),
     Following("following"),
     UserSearch("userSearch"),
-    Notification("notification");
+    Notification("notification"),
+    Groups("groups"),
+    Messages("messages"),
+    JoinRequests("joinRequests"),
+    EditGroup("editGroup"),
+    GroupMembers("groupMembers");
 
     override fun toString(): String {
         return value

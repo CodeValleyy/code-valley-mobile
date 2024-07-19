@@ -190,6 +190,10 @@ fun CurrentUserScreen(navController: NavController, currentUserViewModel: Curren
                         DividerRow()
                         OptionItem(label = "Messages")
                         DividerRow()
+                        OptionItem(label = "Groups", onClick = {
+                            navController.navigate(ScreenName.Groups.toString())
+                        })
+                        DividerRow()
                         OptionItem(label = "Favorites")
                         DividerRow()
                         OptionItem(label = "Log out", onClick = {
