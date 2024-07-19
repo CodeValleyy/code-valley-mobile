@@ -36,8 +36,7 @@ class LoginViewModel @Inject constructor(
         val token = TokenManager.token
         if (token != null) {
             try {
-                val profile = userRepository.getMe()
-                UserStore.userProfile = profile
+                UserStore.setUserProfile(userRepository.getMe())
                 navController.navigate(ScreenName.NewsFeed.toString())
             } catch (e: Exception) {
                 TokenManager.clearToken()
@@ -59,8 +58,7 @@ class LoginViewModel @Inject constructor(
                 when (val apiResponse = userRepository.login(email, password)) {
                     is ApiAuthResponse.Success -> {
                         TokenManager.token = apiResponse.data.accessToken
-                        val profile = userRepository.getMe()
-                        UserStore.userProfile = profile
+                        UserStore.setUserProfile(userRepository.getMe())
                         email = ""
                         password = ""
                         errorMessage = ""

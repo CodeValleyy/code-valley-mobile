@@ -1,6 +1,5 @@
 package com.codevalley.app.store
 
-import android.util.Log
 import com.codevalley.app.model.PostResponseDto
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -12,6 +11,7 @@ object PostStore {
     fun setPosts(posts: List<PostResponseDto>) {
         _posts.value = posts
     }
+
     fun getPostById(postId: Int): PostResponseDto? {
         return _posts.value.firstOrNull { it.id == postId }
     }

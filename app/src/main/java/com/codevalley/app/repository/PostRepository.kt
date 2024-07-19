@@ -1,7 +1,6 @@
 package com.codevalley.app.repository
 
 import android.content.Context
-import com.codevalley.app.model.CreatePostDto
 import com.codevalley.app.model.LikePostResponseDto
 import com.codevalley.app.model.PostResponseDto
 import com.codevalley.app.model.RawPostResponseDto

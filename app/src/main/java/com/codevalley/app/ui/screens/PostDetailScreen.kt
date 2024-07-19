@@ -1,36 +1,25 @@
 package com.codevalley.app.ui.screens
 
 import androidx.compose.runtime.Composable
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import coil.compose.rememberAsyncImagePainter
 import com.codevalley.app.model.Comment
 import com.codevalley.app.store.PostStore
-import com.codevalley.app.store.UserStore.userProfile
+import com.codevalley.app.store.UserStore
 import com.codevalley.app.ui.components.CommentInputSection
 import com.codevalley.app.ui.components.CommentItem
-import com.codevalley.app.ui.components.CommentSection
 import com.codevalley.app.ui.components.LoadingIndicator
 import com.codevalley.app.ui.components.PostItem
-import com.codevalley.app.ui.navigation.ScreenName
 import com.codevalley.app.ui.viewmodel.NewsFeedViewModel
-import java.text.SimpleDateFormat
 import java.util.*
 
 @Composable
@@ -38,6 +27,7 @@ fun PostDetailScreen(postId: Int, navController: NavController, newsFeedViewMode
     val post = PostStore.getPostById(postId)
     var commentText by remember { mutableStateOf("") }
     var comments by remember { mutableStateOf(listOf<Comment>()) }
+    val currentUser = UserStore.getUserProfile()
 
     if (post == null) {
         LoadingIndicator()
@@ -88,9 +78,9 @@ fun PostDetailScreen(postId: Int, navController: NavController, newsFeedViewMode
                         val newComment = Comment(
                             id = comments.size + 1,
                             avatar = post.avatar ?: "",
-                            username = userProfile?.username ?: "Anonymous",
+                            username = currentUser?.username ?: "Anonymous",
                             content = commentText,
-                            userId = userProfile?.id ?: 0,
+                            userId = currentUser?.id ?: 0,
                             createdAt = Date(),
                             hasLiked = false,
                         )

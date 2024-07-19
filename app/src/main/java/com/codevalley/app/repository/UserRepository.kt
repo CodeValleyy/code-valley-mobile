@@ -23,7 +23,6 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import retrofit2.HttpException
 import java.io.IOException
 import java.util.Date
-import java.lang.reflect.Type
 
 class UserRepository @Inject constructor(
     private val retrofit: Retrofit,

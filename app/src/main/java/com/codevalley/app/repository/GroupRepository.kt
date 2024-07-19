@@ -2,7 +2,6 @@ package com.codevalley.app.repository
 
 import com.codevalley.app.model.GroupResponseDTO
 import com.codevalley.app.model.GroupDTO
-import com.codevalley.app.network.AuthService
 import com.codevalley.app.network.GroupService
 import com.codevalley.app.network.createAuthorizedApiService
 import retrofit2.Retrofit
@@ -15,7 +14,8 @@ class GroupRepository @Inject constructor(
     private fun createAuthorizedApiService(): GroupService {
         return createAuthorizedApiService(retrofit, GroupService::class.java)
     }
-        suspend fun createGroup(groupDTO: GroupDTO): GroupResponseDTO {
+
+    suspend fun createGroup(groupDTO: GroupDTO): GroupResponseDTO {
         val groupService = createAuthorizedApiService()
         return groupService.createGroup(groupDTO)
     }
